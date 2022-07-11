@@ -1,0 +1,6 @@
+.vscode/
+source/root_directory.h
+build/
+.vs/
+.idea/
+out/

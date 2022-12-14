@@ -10,7 +10,7 @@
 
 namespace ac = Acousent;
 
-namespace GridGame {
+namespace Acousent {
 SoundDevice* sd = LISTENER->Get();
 int sound1 = SE_LOAD(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
 int sound2 = SE_LOAD(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
@@ -18,7 +18,7 @@ SoundSource source_1;
 SoundSource source_2;
 const constexpr int ROWS = 20, COLUMNS = 20;
 const constexpr float CELLSIZE = 40;  // assumes ROWS == COLUMNS for simplicity
-enum class GraphicKey { UNSEARCHED, SEARCHED, PLAYER1, SOURCE, STAGE };
+enum class GraphicKey { UNSEARCHED, SEARCHED, PLAYER1, SOURCE, SOURCE1, STAGE };
 GraphicKey map[ROWS][COLUMNS];
 bool mapHasChanged = true;  //process a map draw update
 GLuint programID;
@@ -294,6 +294,7 @@ void init() {
 
 	source_1.SetLooping(true);
 	source_1.SetPosition(SOURCE.mapPos[0], SOURCE.mapPos[1], 0);
+	source_2.SetPosition(SOURCE1.mapPos[0], SOURCE1.mapPos[1], 0);
 	source_1.Play(sound1);
 }
 void processMapChanges()

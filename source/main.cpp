@@ -2,10 +2,10 @@
 #include "TopDown.h"
 int main()
 {
-	MainLoop::Get()->SetRunCondition([]() {return GridGame::isRunning(); });
-	MainLoop::Get()->AddToOnBegin([]() {GridGame::processMapChanges(); GridGame::init(); });
-	MainLoop::Get()->AddToOnUpdate([](float dt) {GridGame::processPlayer(dt); /*TTD::processAI(dt);*/ });
-	MainLoop::Get()->AddToOnPostUpdate([]() {GridGame::renderScene(); });
+	MainLoop::Get()->SetRunCondition([]() {return Acousent::isRunning(); });
+	MainLoop::Get()->AddToOnBegin([]() {Acousent::processMapChanges(); Acousent::init(); });
+	MainLoop::Get()->AddToOnUpdate([](float dt) {Acousent::processPlayer(dt); /*TTD::processAI(dt);*/ });
+	MainLoop::Get()->AddToOnPostUpdate([]() {Acousent::renderScene(); });
 	return MainLoop::Get()->Run();
 }
 

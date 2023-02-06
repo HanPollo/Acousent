@@ -16,8 +16,9 @@ int sound1 = SE_LOAD(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_
 int sound2 = SE_LOAD(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
 SoundSource source_1;
 SoundSource source_2;
+const constexpr float WIN_WIDTH = 900, WIN_HEIGHT = 900;
 const constexpr int ROWS = 20, COLUMNS = 20;
-const constexpr float CELLSIZE = 40;  // assumes ROWS == COLUMNS for simplicity
+const constexpr float CELLSIZE = (float)WIN_HEIGHT / ROWS;  // assumes ROWS == COLUMNS for simplicity
 enum class GraphicKey { UNSEARCHED, SEARCHED, PLAYER1, SOURCE, SOURCE1, STAGE };
 GraphicKey map[ROWS][COLUMNS];
 bool mapHasChanged = true;  //process a map draw update
@@ -261,7 +262,7 @@ void init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
-	window = glfwCreateWindow(COLUMNS * CELLSIZE, ROWS * CELLSIZE, "stage top down", nullptr/*mainmonitor*/, nullptr/*share*/);
+	window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "stage top down", nullptr/*mainmonitor*/, nullptr/*share*/);
 	if (!window) {
 		throw("error with window init");
 		glfwTerminate();
@@ -424,13 +425,21 @@ void renderScene()
 {
 	if (mapHasChanged)
 	{
+
+		// Aca esta el problema de cambiar cantidad de asientos
 		mapHasChanged = false;
 		clearScreen();
 		glUseProgram(programID);
-		float iteT = (((float)ROWS / 10)*.09f);
+		//float iteT = (((float)ROWS / 10)*.09f);
+		//float iteS = ((float)CELLSIZE / 40);
+		//float iteR = (((float)ROWS / 10)-1.f) / (float)ROWS;
+		//float iteC = (((float)COLUMNS / 10) - 1.f) / (float)COLUMNS;
+		//float iteST = (float)CELLSIZE / 10;
+
+		float iteT = 2.f * .09f;
 		float iteS = ((float)CELLSIZE / 40);
-		float iteR = (((float)ROWS / 10)-1.f) / (float)ROWS;
-		float iteC = (((float)COLUMNS / 10) - 1.f) / (float)COLUMNS;
+		float iteR = 1.f / (float)ROWS;
+		float iteC = 1.f/ (float)COLUMNS;
 		float iteST = (float)CELLSIZE / 10;
 		/// <summary>
 		/// Where map[0][0] is the Bottom Left, and map[ROWS-1][COLUMNS-1] is the Top Right.
@@ -442,6 +451,8 @@ void renderScene()
 				glUniform3fv(glGetUniformLocation(programID, "ucolor"), 1, &aColor[0]);
 				glm::mat4 ModelMatrix(1.0f);
 				glm::vec3 Translate((float)(((float)r) / (float)COLUMNS) * 2.f - .9f - iteR, (float)(((float)c) / (float)ROWS) * 2.f - .9f - iteR, 0.f);
+
+				//glm::vec3 Translate((float)(((float)r) / (float)COLUMNS) * 2.f - .9f - iteR, (float)(((float)c) / (float)ROWS) * 2.f - .9f - iteR, 0.f);
 				ModelMatrix = glm::translate(ModelMatrix, Translate);
 				glm::vec3 Scale(1);
 				if(c<(COLUMNS/2))

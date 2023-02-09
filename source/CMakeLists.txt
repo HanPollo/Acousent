@@ -4,11 +4,14 @@ set(ACOUSENT_HEADERS
         SoundLibrary.h
         SoundSource.h
         TopDown.h
+        imgui-style.h
+        utils.h
         )
 set(ACOUSENT_SOURCES
         SoundDevice.cpp
         SoundLibrary.cpp
         SoundSource.cpp
+        utils.cpp
         )
 
 add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS})

@@ -9,13 +9,14 @@ set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gla
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/openal-soft/include"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/dr_libs"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/MainLoop"
+									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui-1.78"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/entt/src")
 set(ACOUSENT_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/source")
 
 if(MSVC)
-    set(THIRD_PARTY_LIBRARIES ${OPENGL_LIBRARIES} ${BULLET_LIBRARIES} OpenAL glfw glad glm EnTT::EnTT OpenAL dr_libs)
+    set(THIRD_PARTY_LIBRARIES ${OPENGL_LIBRARIES} ${BULLET_LIBRARIES} OpenAL glfw glad glm EnTT::EnTT OpenAL dr_libs ImGui)
 else()
-    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ${BULLET_LIBRARIES} stdc++fs glm EnTT::EnTT OpenAL dr_libs)
+    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ${BULLET_LIBRARIES} stdc++fs glm EnTT::EnTT OpenAL dr_libs ImGui)
 endif(MSVC)
 
 configure_file(CMakeConfigFiles/root_directory.h.in "${CMAKE_SOURCE_DIR}/source/root_directory.h")

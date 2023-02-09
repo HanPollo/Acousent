@@ -2,11 +2,22 @@
 #include "SoundDevice.h"
 #include "SoundSource.h"
 #include "SoundLibrary.h"
+
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#include <imgui.h>
+#include "examples/imgui_impl_opengl3.cpp"
+#include "examples/imgui_impl_glfw.cpp" 
+
 #include <glm/ext/vector_float3.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
 #include "root_directory.h"
+
+#include "imgui-style.h"
+#include "utils.h"
+
+
 
 namespace ac = Acousent;
 
@@ -38,6 +49,18 @@ int source1_locy = COLUMNS - (COLUMNS / 4) - 1;
 int source2_locx = (ROWS / 4);
 int source2_locy = COLUMNS - (COLUMNS / 4) - 1;
 Actor PLAYER1, SOURCE(source1_locx, source1_locy), SOURCE1(source2_locx, source2_locy);
+
+std::string fontName = "JetBrainsMono-ExtraLight.ttf";
+float highDPIscaleFactor = 1.0;
+bool show_demo_window = false;
+bool show_another_window = false;
+int counter = 0;
+
+float source1_volume = .8f;
+float source2_volume = .8f;
+
+
+
 GLFWwindow* window;
 void loadSquare() {
 	GLuint VertexArrayID;
@@ -196,6 +219,140 @@ GLuint loadShader(const char* vertexshader, const char* fragmentshader) {
 
 	return ProgramID;
 }
+
+// ImGui
+
+bool initializeDearImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	io.Fonts->AddFontFromFileTTF(
+		ac::getPath("Resources/Font/" + fontName).string().c_str(),
+		24.0f * highDPIscaleFactor,
+		NULL,
+		NULL
+	);
+	setImGuiStyle(highDPIscaleFactor);
+
+	// setup platform/renderer bindings
+	if (!ImGui_ImplGlfw_InitForOpenGL(window, true)) { return false; }
+	if (!ImGui_ImplOpenGL3_Init()) { return false; }
+
+	return true;
+}
+
+void composeDearImGuiFrame()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+
+	ImGui::NewFrame();
+
+	// standard demo window
+	if (show_demo_window) { ImGui::ShowDemoWindow(&show_demo_window); }
+
+	// a window is defined by Begin/End pair
+	{
+		int glfw_width = 0, glfw_height = 0, controls_width = 0;
+		// get the window size as a base for calculating widgets geometry
+		glfwGetFramebufferSize(window, &glfw_width, &glfw_height);
+		controls_width = glfw_width;
+		// make controls widget width to be 1/3 of the main window width
+		if ((controls_width /= 3) < 300) { controls_width = 300; }
+
+		// position the controls widget in the top-right corner with some margin
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+		// here we set the calculated width and also make the height to be
+		// be the height of the main window also with some margin
+		ImGui::SetNextWindowSize(
+			ImVec2(static_cast<float>(controls_width), static_cast<float>(glfw_height - 20)),
+			ImGuiCond_Always
+		);
+
+		ImGui::SetNextWindowBgAlpha(0.7f);
+		// create a window and append into it
+		ImGui::Begin("Controls", NULL, ImGuiWindowFlags_NoResize);
+
+		ImGui::Dummy(ImVec2(0.0f, 1.0f));
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Time");
+		ImGui::Text("%s", currentTime(std::chrono::system_clock::now()).c_str());
+
+		ImGui::Dummy(ImVec2(0.0f, 3.0f));
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Application");
+		ImGui::Text("Main window width: %d", glfw_width);
+		ImGui::Text("Main window height: %d", glfw_height);
+
+		ImGui::Dummy(ImVec2(0.0f, 3.0f));
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "GLFW");
+		ImGui::Text("%s", glfwGetVersionString());
+
+		ImGui::Dummy(ImVec2(0.0f, 3.0f));
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Dear ImGui");
+		ImGui::Text("%s", IMGUI_VERSION);
+
+		ImGui::Dummy(ImVec2(0.0f, 10.0f));
+		ImGui::Separator();
+		ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+		// buttons and most other widgets return true when clicked/edited/activated
+		if (ImGui::Button("Counter button"))
+		{
+			std::cout << "counter button clicked" << std::endl;
+			counter++;
+			if (counter == 9) { ImGui::OpenPopup("Easter egg"); }
+		}
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		if (ImGui::BeginPopupModal("Easter egg", NULL))
+		{
+			ImGui::Text("Ho-ho, you found me!");
+			if (ImGui::Button("Buy Ultimate Orb")) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+
+		ImGui::Dummy(ImVec2(0.0f, 15.0f));
+		if (!show_demo_window)
+		{
+			if (ImGui::Button("Open standard demo"))
+			{
+				show_demo_window = true;
+			}
+		}
+
+		ImGui::Checkbox("show a custom window", &show_another_window);
+		if (show_another_window)
+		{
+			ImGui::SetNextWindowSize(
+				ImVec2(250.0f, 150.0f),
+				ImGuiCond_FirstUseEver // after first launch it will use values from imgui.ini
+			);
+			// the window will have a closing button that will clear the bool variable
+			ImGui::Begin("A custom window", &show_another_window);
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Some label");
+
+			ImGui::TextColored(ImVec4(128 / 255.0f, 128 / 255.0f, 128 / 255.0f, 1.0f), "%s", "another label");
+			ImGui::Dummy(ImVec2(0.0f, 0.5f));
+
+			ImGui::Dummy(ImVec2(0.0f, 1.0f));
+			if (ImGui::Button("Close"))
+			{
+				std::cout << "close button clicked" << std::endl;
+				show_another_window = false;
+			}
+
+			ImGui::End();
+		}
+
+		ImGui::End();
+	}
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
@@ -297,6 +454,8 @@ void init() {
 	source_1.SetPosition(SOURCE.mapPos[0], SOURCE.mapPos[1], 0);
 	source_2.SetPosition(SOURCE1.mapPos[0], SOURCE1.mapPos[1], 0);
 	source_1.Play(sound1);
+
+
 }
 void processMapChanges()
 {
@@ -363,6 +522,11 @@ void processPlayer(float dt)
 			setPLAYER1ListenerLoc();
 		}
 	}
+
+	// Va a process audio
+	alSourcef(sound1, AL_GAIN, source1_volume);
+	alSourcef(sound2, AL_GAIN, source2_volume);
+
 }
 void processAI(float dt) {
 	if (SOURCE.hasUnprocessedMoved)
@@ -417,6 +581,31 @@ void setCellDrawColor(const int& x, const int& y) {
 		break;
 	}
 }
+/*
+void ImGuiWindow()
+{
+	// ImGUI window creation
+
+	ImGui::Begin("Acousent");
+	// Text that appears in the window
+	ImGui::Text("Hello there musicians!");
+	// Button that appears in the window
+	if (ImGui::Button("Play left source"))
+	{
+		if (source_2.isPlaying())
+			source_2.Stop();
+		else
+			source_2.Play(sound2);
+	}
+	// Slider that appears in the window
+	ImGui::SliderFloat("Volume Right Source", &source1_volume, 0.f, 1.f);
+	// Slider that appears in the window
+	ImGui::SliderFloat("Volume Right Source", &source1_volume, 0.f, 1.f);
+	// Ends the window
+	ImGui::End();
+
+}
+*/
 void clearScreen()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -429,6 +618,7 @@ void renderScene()
 		// Aca esta el problema de cambiar cantidad de asientos
 		mapHasChanged = false;
 		clearScreen();
+
 		glUseProgram(programID);
 		//float iteT = (((float)ROWS / 10)*.09f);
 		//float iteS = ((float)CELLSIZE / 40);
@@ -464,6 +654,11 @@ void renderScene()
 				glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles -> 6 squares
 			}
 		}
+		
+		// Dear ImGui frame
+		composeDearImGuiFrame();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 	}
@@ -471,3 +666,5 @@ void renderScene()
 }
 bool isRunning() { return (!glfwWindowShouldClose(window)); }
 }  // end namespace TTD
+
+

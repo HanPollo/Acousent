@@ -21,13 +21,8 @@ set(GLFW_INSTALL OFF CACHE BOOL "")
 add_subdirectory_with_folder("third_party" glad)
 add_subdirectory_with_folder("third_party" glfw)
 add_subdirectory_with_folder("third_party/OpenAL" openal-soft)
-add_subdirectory_with_folder("third_party" entt)
 add_subdirectory_with_folder("third_party" glm)
-add_subdirectory_with_folder("third_party" imgui-1.78)
 
-#dr_libs
-add_library(dr_libs INTERFACE)
-target_include_directories(dr_libs INTERFACE dr_libs)
 
 
 

@@ -1,17 +1,17 @@
 set(ACOUSENT_HEADERS
-        OpenALErrorCheck.h
-        SoundDevice.h
-        SoundLibrary.h
-        SoundSource.h
+        Audio/OpenALErrorCheck.h
+        Audio/SoundDevice.h
+        Audio/SoundLibrary.h
+        Audio/SoundSource.h
         TopDown.h
-        imgui-style.h
-        utils.h
+        Rendering/imgui-style.h
+        "Core/utils.h"
         )
 set(ACOUSENT_SOURCES
-        SoundDevice.cpp
-        SoundLibrary.cpp
-        SoundSource.cpp
-        utils.cpp
+        Audio/SoundDevice.cpp
+        Audio/SoundLibrary.cpp
+        Audio/SoundSource.cpp
+        Core/utils.cpp
         )
 
 add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS})

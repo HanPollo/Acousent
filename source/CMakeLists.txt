@@ -1,20 +1,47 @@
 set(ACOUSENT_HEADERS
-        OpenALErrorCheck.h
-        SoundDevice.h
-        SoundLibrary.h
-        SoundSource.h
-        TopDown.h
-        imgui-style.h
-        utils.h
+        "Audio/OpenALErrorCheck.h"
+        "Audio/SoundDevice.h"
+        "Audio/SoundLibrary.h"
+        "Audio/SoundSource.h"
+
+        "Core/TopDown.h"
+        "Core/utils.h"
+        "Core/Window.h"
+
+        "Objects/Object.h"
+        "Objects/Speaker.h"
+        "Objects/Seat.h"
+        "Objects/SeatCoords.h"
+
+        "GUI/imgui-style.h"
+
+        "Rendering/Camera.h"
+        "Rendering/Mesh.h"
+        "Rendering/Model.h"
+        "Rendering/Shader.h"
+        #"Rendering/Texture.h"
+
         )
 set(ACOUSENT_SOURCES
-        SoundDevice.cpp
-        SoundLibrary.cpp
-        SoundSource.cpp
-        utils.cpp
+        "Core/utils.cpp"
+        "Core/Window.cpp"
+
+        "Objects/Object.cpp"
+        "Objects/Speaker.cpp"
+        "Objects/Seat.cpp"
+
+        "Audio/SoundDevice.cpp"
+        "Audio/SoundLibrary.cpp"
+        "Audio/SoundSource.cpp"
+        
+        "Rendering/Camera.cpp"
+        "Rendering/Mesh.cpp"
+        "Rendering/Model.cpp"
+        "Rendering/Shader.cpp"
+        #"Rendering/Texture.cpp"
         )
 
-add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS})
+add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS} Core/system.h ${Shaders})
 if (MSVC)
     target_compile_options(acousent PUBLIC /wd5033)
 endif(MSVC)
@@ -24,11 +51,17 @@ set_property(TARGET acousent PROPERTY CXX_STANDARD 20)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS})
 
 
-add_executable(main main.cpp)
-set_property(TARGET main PROPERTY CXX_STANDARD 20)
-target_link_libraries(main PRIVATE acousent)
-target_include_directories(main PRIVATE ${ACOUSENT_INCLUDE_DIRECTORY} ${THIRD_PARTY_INCLUDE_DIRECTORIES})
-add_custom_command(TARGET main POST_BUILD        
+function(MakeExample TARGETNAME FILENAME)
+	add_executable(${TARGETNAME} ${FILENAME})
+	set_property(TARGET ${TARGETNAME} PROPERTY CXX_STANDARD 20)
+	set_property(TARGET ${TARGETNAME} PROPERTY FOLDER Examples)
+	target_link_libraries(${TARGETNAME} PRIVATE acousent)
+	target_include_directories(${TARGETNAME} PRIVATE ${BOOM_BOOM_INCLUDE_DIRECTORY} ${THIRD_PARTY_INCLUDE_DIRECTORIES})
+	add_custom_command(TARGET ${TARGETNAME} POST_BUILD        
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-        $<TARGET_FILE:OpenAL> $<TARGET_FILE_DIR:main>)
+        $<TARGET_FILE:OpenAL> $<TARGET_FILE_DIR:${TARGETNAME}>)
 
+endfunction(MakeExample)
+
+add_compile_definitions(AL_LIBTYPE_STATIC)
+MakeExample(main main.cpp)

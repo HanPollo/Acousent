@@ -1,0 +1,11 @@
+Model Information:
+* title:	LowPoly Modern Auditorium Classroom
+* source:	https://sketchfab.com/3d-models/lowpoly-modern-auditorium-classroom-83418d6d74214aa4ad3ef716c9f959e3
+* author:	Adam Bajgar (https://sketchfab.com/adam.bajgar)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "LowPoly Modern Auditorium Classroom" (https://sketchfab.com/3d-models/lowpoly-modern-auditorium-classroom-83418d6d74214aa4ad3ef716c9f959e3) by Adam Bajgar (https://sketchfab.com/adam.bajgar) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

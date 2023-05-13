@@ -1,0 +1,11 @@
+Model Information:
+* title:	ibanez jem guitar
+* source:	https://sketchfab.com/3d-models/ibanez-jem-guitar-daeadd913644438aa3096bb357a02016
+* author:	abazibiz (https://sketchfab.com/abazibiz)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "ibanez jem guitar" (https://sketchfab.com/3d-models/ibanez-jem-guitar-daeadd913644438aa3096bb357a02016) by abazibiz (https://sketchfab.com/abazibiz) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,14 +1,241 @@
-#include "MainLoop.h"
-#include "TopDown.h"
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
-using namespace std;
-int main()
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "root_directory.h"
+
+#include "Rendering/Shader.h"
+#include "Rendering/Model.h"
+#include "Rendering/Camera.h"
+
+#include "Core/Window.h"
+
+#include "Objects/Speaker.h"
+#include "Objects/Seat.h"
+
+#include "Audio/SoundDevice.h"
+#include "Audio/SoundLibrary.h"
+
+
+
+namespace ac = Acousent;
+
+const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_HEIGHT = 1000;
+
+// Set up camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float deltaTime = .01667f;
+bool firstMouse = true;
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+char seatRow = 'A';
+int seatColumn = 1;
+
+Speaker speaker2;
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	MainLoop::Get()->SetRunCondition([]() {return Acousent::isRunning(); });
-	MainLoop::Get()->AddToOnBegin([]() {Acousent::processMapChanges(); Acousent::init(); Acousent::initializeDearImGui();  });
-	MainLoop::Get()->AddToOnUpdate([](float dt) {Acousent::processPlayer(dt); /*TTD::processAI(dt);*/ });
-	MainLoop::Get()->AddToOnPostUpdate([]() {Acousent::renderScene(); });
-	return MainLoop::Get()->Run();
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+        speaker2.Play();
+
+    //Camera position
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        string Sname = std::to_string(seatRow) + std::to_string(seatColumn);
+        Seat seat = Seat(Sname, camera.position_);
+        seat.AddSeatCoordinate();
+        seatColumn++;
+        if (seatRow == 'A' && seatColumn == 17) {
+            seatRow = 'B';
+            seatColumn = 1;
+        }
+        if (seatRow == 'B' && seatColumn == 17) {
+            seatRow = 'C';
+            seatColumn = 1;
+        }
+        if (seatRow == 'C' && seatColumn == 17) {
+            seatRow = 'D';
+            seatColumn = 1;
+        }
+        if (seatRow == 'D' && seatColumn == 17) {
+            seatRow = 'E';
+            seatColumn = 1;
+        }
+        if (seatRow == 'E' && seatColumn == 17) {
+            seatRow = 'F';
+            seatColumn = 1;
+        }
+        if (seatRow == 'F' && seatColumn == 17) {
+            seatRow = 'G';
+            seatColumn = 1;
+        }
+    }
+
+    //Camera controls
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        camera.processKeyboard(CameraMovement::FORWARD, false);
+    if (key == GLFW_KEY_S && action == GLFW_PRESS)
+        camera.processKeyboard(CameraMovement::BACKWARD, false);
+    if (key == GLFW_KEY_A && action == GLFW_PRESS)
+        camera.processKeyboard(CameraMovement::LEFT, false);
+    if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        camera.processKeyboard(CameraMovement::RIGHT, false);
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+        glfwSetWindowShouldClose(window, true);
+    if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+        camera.processKeyboard(CameraMovement::FORWARD, true);
+    if (key == GLFW_KEY_S && action == GLFW_RELEASE)
+        camera.processKeyboard(CameraMovement::BACKWARD, true);
+    if (key == GLFW_KEY_A && action == GLFW_RELEASE)
+        camera.processKeyboard(CameraMovement::LEFT, true);
+    if (key == GLFW_KEY_D && action == GLFW_RELEASE)
+        camera.processKeyboard(CameraMovement::RIGHT, true);
 }
 
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.processMouseMovement(xoffset, yoffset, false);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.processMouseScroll(static_cast<float>(yoffset));
+}
+
+int main()
+{
+    // Initialize GLFW and create a window
+    Window window(SCR_WIDTH, SCR_HEIGHT, "3D Audio Simulation");
+
+    // init shaders
+    Shader shader(ac::getPath("Resources/Shaders/default.vs").string().c_str(), ac::getPath("Resources/Shaders/default.fs").string().c_str());
+
+    // init auditorium
+    Model auditorium(ac::getPath("Resources/Models/Auditorium/scene.gltf").string());
+    //init Sound Device
+    SoundDevice* sd = LISTENER->Get();
+    ALint attunation = AL_INVERSE_DISTANCE_CLAMPED;
+    sd->SetAttunation(attunation);
+    sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
+    sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
+    // init SoundLibrary
+    SoundLibrary* AudioLib = SoundLibrary::Get();
+
+    // init sounds
+    int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
+    // init audio sources
+    SoundSource speaker1_source;
+    SoundSource speaker2_source;
+
+    // init speaker1
+    Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
+    Speaker speaker1;
+    speaker1.setModel(speaker_model);
+    speaker1.setShader(shader);
+    speaker1.addAudioSource(speaker1_source);
+    speaker1.addSound(speaker_sound);
+    speaker1.SetLooping(true);
+    // move speaker 1
+    speaker1.Translate(0.f, 0.f, 230.f);
+    speaker1.Update();
+
+    // init speaker2
+    //Speaker speaker2;
+    speaker2.setModel(speaker_model);
+    speaker2.setShader(shader);
+    speaker2.addAudioSource(speaker2_source);
+    speaker2.addSound(speaker_sound);
+    // move speaker 1
+    speaker2.Translate(0.f, 0.f, -400.f);
+
+    // Set up camera
+    //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+
+    glfwSetKeyCallback(window.getGLFWWindow(), key_callback);
+    glfwSetCursorPosCallback(window.getGLFWWindow(), mouse_callback);
+    glfwSetScrollCallback(window.getGLFWWindow(), scroll_callback);
+
+    // Set up projection matrix
+    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()),
+        (float)window.getWidth() / (float)window.getHeight(),
+        0.1f, 100.0f);
+
+    glm::mat4 auditorium_model = glm::mat4(1.0f);
+
+    // Set up theater:
+    //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
+    
+    // Speaker 1 Play
+    speaker1.Play();
+    // Set up rendering
+    glEnable(GL_DEPTH_TEST);
+
+    // Rendering loop
+    while (!window.shouldClose()) {
+        // Update camera
+        float deltaTime = window.getDeltaTime();
+        camera.processMovement(deltaTime);
+
+        // Clear the screen
+        glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Set up view matrix
+        glm::mat4 view = camera.getViewMatrix();
+
+
+        // Set up shader
+        shader.use();
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+
+        // Render the auditorium
+        shader.setMat4("model", auditorium_model);
+        auditorium.Draw(shader);
+        // Update Sound device
+        sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
+        sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
+
+        // Update and Draw Speakers
+        speaker1.Update();
+        speaker2.Update();
+        speaker1.Draw();
+        speaker2.Draw();
+
+        // Swap buffers and poll events
+        window.swapBuffers();
+        window.pollEvents();
+    }
+
+    // Clean up
+    glfwTerminate();
+    return 0;
+}

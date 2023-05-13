@@ -19,4 +19,9 @@
 [submodule "third_party/imgui"]
 	path = third_party/imgui
 	url = https://github.com/ocornut/imgui.git
-
+[submodule "third_partyassimp"]
+	path = third_party/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "openmesh"]
+	path = openmesh
+	url = https://github.com/Lawrencemm/openmesh.git

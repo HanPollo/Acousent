@@ -11,8 +11,8 @@ std::string FileSystem::getPath(const std::string &path) {
 }
 
 std::string const &FileSystem::getRoot() {
-    static char const * envRoot = getenv("BOOM_BOOM_ROOT_PATH");
-    static char const * givenRoot = (envRoot != nullptr ? envRoot : BoomBoom::source_directory);
+    static char const * envRoot = getenv("ACOUSENT_ROOT_PATH");
+    static char const * givenRoot = (envRoot != nullptr ? envRoot : acousent::source_directory);
     static std::string root = (givenRoot != nullptr ? givenRoot : "");
     return root;
 }

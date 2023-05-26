@@ -1,6 +1,6 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
 cmake_minimum_required(VERSION 3.15)
-project(BoomBoom C CXX)
+project(acousent C CXX)
 find_package(OpenGL REQUIRED)
 #add_definitions(-D_USE_MATH_DEFINES)
 set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include"
@@ -15,7 +15,7 @@ set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gla
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/MainLoop"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/entt/src")
-set(BOOM_BOOM_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/source")
+set(ACOUSENT_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/source")
 
 if(MSVC)
     set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ImGui ${BULLET_LIBRARIES} OpenAL dr_libs assimp stb OpenMeshCore)
@@ -29,5 +29,5 @@ configure_file(CMakeConfigFiles/root_directory.h.in "${CMAKE_SOURCE_DIR}/source/
 add_subdirectory(third_party)
 add_subdirectory(source)
 add_subdirectory(Examples)
-#add_subdirectory(Engine)
+
 

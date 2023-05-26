@@ -2,8 +2,8 @@
 // Created by pollo on 6/8/2022.
 //
 
-#ifndef BOOMBOOMENGINE_FILESYSTEM_H
-#define BOOMBOOMENGINE_FILESYSTEM_H
+#ifndef FILESYSTEM_H
+#define FILESYSTEM_H
 #include <string>
 #include <cstdlib>
 
@@ -25,4 +25,4 @@ private:
 
 };
 
-#endif //BOOMBOOMENGINE_FILESYSTEM_H
+#endif //FILESYSTEM_H

@@ -1,7 +1,7 @@
 #pragma once
-#include "Audio/SoundDevice.h"
-#include "Audio/SoundSource.h"
-#include "Audio/SoundLibrary.h"
+#include "../Audio/SoundDevice.h"
+#include "../Audio/SoundSource.h"
+#include "../Audio/SoundLibrary.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>
@@ -12,10 +12,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
-#include "root_directory.h"
+#include "../root_directory.h"
 
-#include "GUI/imgui-style.h"
-#include "utils.h"
+#include "../GUI/imgui-style.h"
+#include "../Core/utils.h"
 
 
 

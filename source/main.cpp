@@ -9,6 +9,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#include <imgui.h>
+#include "examples/imgui_impl_opengl3.cpp"
+#include "examples/imgui_impl_glfw.cpp" 
+
+
 #include "root_directory.h"
 
 #include "Rendering/Shader.h"
@@ -25,13 +31,14 @@
 
 
 
+
 namespace ac = Acousent;
 
 const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 1000;
 
 // Set up camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(-0.5f, 3.0f, 9.0f));
 float deltaTime = .01667f;
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
@@ -40,6 +47,80 @@ char seatRow = 'A';
 int seatColumn = 1;
 
 Speaker speaker2;
+
+GLuint RenderToTexture()
+{
+    GLuint fbo, texture;
+
+    // Create framebuffer object
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    // Create texture object
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Attach texture to framebuffer object
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    // Check for framebuffer completeness
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        printf("Framebuffer incomplete: %x\n", status);
+        exit(1);
+    }
+
+    // Render your scene to the FBO
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // ...render your scene here...
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Return the texture ID
+    return texture;
+}
+
+void renderImGui() {
+    // ImGUI related
+
+    ImGui::Begin("Main Window");
+
+    // Render your OpenGL output to a texture
+    GLuint textureID = RenderToTexture();
+
+    // Display the texture inside an ImGui window
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImGui::Image((void*)(intptr_t)textureID, windowSize);
+
+    // Add other viewports
+    //if (ImGui::Begin("Side Viewport", nullptr, ImGuiWindowFlags_NoScrollbar)) {
+        // Render your other viewport here
+    //}
+    //ImGui::End();
+
+    // Add a main menu
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            // Add menu items for File
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            // Add menu items for Edit
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("View")) {
+            // Add menu items for View
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+
+    ImGui::End();
+
+}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -129,6 +210,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.processMouseScroll(static_cast<float>(yoffset));
 }
 
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
 int main()
 {
     // Initialize GLFW and create a window
@@ -182,6 +272,7 @@ int main()
     glfwSetKeyCallback(window.getGLFWWindow(), key_callback);
     glfwSetCursorPosCallback(window.getGLFWWindow(), mouse_callback);
     glfwSetScrollCallback(window.getGLFWWindow(), scroll_callback);
+    glfwSetFramebufferSizeCallback(window.getGLFWWindow(), framebuffer_size_callback);
 
     // Set up projection matrix
     glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()),
@@ -230,6 +321,16 @@ int main()
         speaker1.Draw();
         speaker2.Draw();
 
+
+
+        /*
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        renderImGui();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        */
         // Swap buffers and poll events
         window.swapBuffers();
         window.pollEvents();

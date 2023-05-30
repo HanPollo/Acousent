@@ -20,6 +20,7 @@ add_subdirectory_with_folder("third_party/OpenAL" openal-soft)
 add_subdirectory_with_folder("third_party/OpenMesh" openmesh)
 add_subdirectory_with_folder("third_party/Assimp" assimp)
 add_subdirectory_with_folder("third_party" stb)
+add_subdirectory_with_folder("third_party" json)
 
 
 #dr_libs

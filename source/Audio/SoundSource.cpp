@@ -1,12 +1,24 @@
 #include "SoundSource.h"
 #include <iostream>
 #include "OpenALErrorCheck.h"
+#include <vector>
 
 SoundSource::SoundSource()
 {
 	alGenSources(1, &p_Source);
 	alSourcei(p_Source, AL_BUFFER, p_Buffer);
 	AL_CheckAndThrow();
+}
+
+SoundSource::SoundSource(int amount, std::vector<SoundSource*> sources)
+{
+	
+	for (int i = 0; i < amount; i++) {
+		SoundSource source;
+		sources.push_back(&source);
+	}
+	
+
 }
 
 SoundSource::~SoundSource()
@@ -79,7 +91,7 @@ bool SoundSource::isPlaying()
 	return (playState == AL_PLAYING);
 }
 
-ALuint SoundSource::getSourceID()
+ALuint SoundSource::getSourceID() const
 {
 	return p_Source;
 }

@@ -7,10 +7,14 @@
 #include <string>
 #include <cstdlib>
 
+using json = nlohmann::json;
+
 class FileSystem
 {
 public:
     static std::string getPath(const std::string& path);
+    json readJsonFromFile(const std::string& filename);
+    void getAllKeys(const json& jsonObject, std::vector<std::string>& keys);
 
 private:
     typedef std::string (*Builder) (const std::string& path);

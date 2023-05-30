@@ -1,6 +1,6 @@
 #include "Object.h"
 
-Object::Object()
+Object::Object() //Ponerle game Object
 {
 	object_model = nullptr;
 	object_shader = nullptr;
@@ -9,8 +9,7 @@ Object::Object()
 
 Object::~Object()
 {
-	if (object_Asource != nullptr)
-		alDeleteSources(1, &sourceID);
+	std::cout << "ACA";
 }
 
 
@@ -44,6 +43,7 @@ void Object::addAudioSource(SoundSource& audio_source)
 	object_Asource->SetPosition(position[0], position[1], position[2]);
 
 }
+
 
 void Object::addSound(int sound)
 {

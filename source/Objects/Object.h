@@ -5,7 +5,9 @@
 #include "../Rendering/Model.h"
 #include "../Audio/SoundSource.h"
 #include <list>
+#include "../root_directory.h"
 
+namespace ac = Acousent;
 class Object
 {
 	enum Axis {
@@ -27,6 +29,7 @@ public:
 	void Draw();
 
 	void addAudioSource(SoundSource& audio_source);
+
 	void addSound(int sound);
 	void Play(const ALuint& buffer_to_play);
 	void Play();

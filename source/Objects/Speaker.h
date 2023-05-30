@@ -12,7 +12,6 @@ class Speaker : public Object {
 public:
     Speaker();
     Speaker(Type type);
-    ~Speaker();
 
     void Update() override;
 

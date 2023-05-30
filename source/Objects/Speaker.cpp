@@ -7,12 +7,15 @@ Speaker::Speaker() : Object()
     transform_model = glm::scale(transform_model, glm::vec3(0.007f, 0.007f, 0.007f));
     transform_model = glm::rotate(transform_model, glm::radians(90.0f), glm::vec3(0, 1, 0));
 
-    sound_direction = glm::vec3(0.0f, 0.0f, 1.0f);
+    //sound_direction = glm::vec3(0.0f, 0.0f, 1.0f);
+	//SoundSource source;
+	//this->addAudioSource(source);
+
+	//Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
+	//this->setModel(speaker_model);
+
 }
 
-Speaker::~Speaker()
-{
-}
 
 void Speaker::Update()
 {

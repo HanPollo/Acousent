@@ -1,10 +1,13 @@
 #pragma once
 #include <AL\al.h>
 #include <glm/glm.hpp>
+#include <vector>
+
 class SoundSource
 {
 public:
 	SoundSource();
+	SoundSource(int amount, std::vector<SoundSource*> sources);
 	~SoundSource();
 
 	void Play(const ALuint& buffer_to_play);
@@ -23,7 +26,7 @@ public:
 	glm::vec3 GetPosition();
 
 	bool isPlaying();
-	ALuint getSourceID();
+	ALuint getSourceID() const;
 
 private:
 	ALuint p_Source;

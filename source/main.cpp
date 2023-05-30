@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <nlohmann/json.hpp>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>
@@ -33,6 +34,8 @@
 
 
 namespace ac = Acousent;
+using json = nlohmann::json;
+
 
 const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 1000;
@@ -46,8 +49,109 @@ float lastY = SCR_HEIGHT / 2.0f;
 char seatRow = 'A';
 int seatColumn = 1;
 
-Speaker speaker2;
+//Speaker speaker2;
+vector<Speaker> all_speakers;
+vector<SoundSource*> all_sources;
+vector<Model*> all_models;
+SoundLibrary* AudioLib = SoundLibrary::Get();
 
+// JSON Configuration
+json readJsonFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    json jsonObject;
+    file >> jsonObject;
+
+    return jsonObject;
+}
+
+void getAllJSONKeys(const json& jsonObject, std::vector<std::string>& keys) {
+    for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it) {
+        if (it->is_object()) {
+            getAllJSONKeys(it.value(), keys);  // Recursively process nested objects
+        }
+        keys.push_back(it.key());
+    }
+}
+//End JSON Config
+
+// Process speakers from json
+void processSpeakers(vector<Speaker> speakers) {
+    try {
+        json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution.json").string()); //Se deberia recibir como parametro.
+        // Access the speaker objects in the array
+        if (distribution.contains("speakers") && distribution["speakers"].is_array()) {
+            for (const auto& speaker : distribution["speakers"]) {
+                // Access the properties of each piano object
+                float speakerX = speaker["position"]["x"];
+                float speakerY = speaker["position"]["y"];
+                float speakerZ = speaker["position"]["z"];
+                std::string audioFileName = speaker["audio_file"];
+
+
+                // Process the piano properties...
+                
+                //Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
+                //all_models.push_back(&speaker_model);
+
+                Speaker speaker1; // revisar in placeback
+
+                //SoundSource source;
+                //all_sources.push_back(&source);
+                int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/"+audioFileName).string().c_str());
+                //speaker1.setModel(speaker_model);
+
+                //speaker1.addAudioSource(source);
+                speaker1.addSound(speaker_sound);
+                //speaker1.SetLooping(true);
+                
+                // move speaker 1
+                speaker1.Translate(speakerX, speakerY, speakerZ);
+                speaker1.Update();
+                all_speakers.push_back(speaker1);
+                
+
+                std::cout << "Piano position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
+                std::cout << "Audio file name: " << audioFileName << std::endl;
+                std::cout << std::endl;
+            }
+        }
+
+      
+
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << std::endl;
+    }
+}
+
+void setShaderToInstruments(Shader& shader) {
+    for (Speaker speaker : all_speakers) {
+        speaker.setShader(shader);
+    }
+}
+
+void setModelsToInstruments(Model& model) {
+    for (Speaker instrument : all_speakers) {
+        instrument.setModel(model);
+    }
+}
+
+void setSoundSourcesToInstruments(vector<Object*> instruments) {
+    for (Object* instrument : instruments) {
+        SoundSource source;
+        //sources.push_back(&source);
+        instrument->addAudioSource(source);
+
+        //speaker1.addSound(speaker_sound);
+        instrument->SetLooping(true);
+    }
+}
+
+// end instrument process
 GLuint RenderToTexture()
 {
     GLuint fbo, texture;
@@ -127,8 +231,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
-        speaker2.Play();
+    //if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+        //speaker2.Play();
 
     //Camera position
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
@@ -236,14 +340,39 @@ int main()
     sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
     sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
     // init SoundLibrary
-    SoundLibrary* AudioLib = SoundLibrary::Get();
+    //SoundLibrary* AudioLib = SoundLibrary::Get();
 
     // init sounds
     int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
     // init audio sources
-    SoundSource speaker1_source;
-    SoundSource speaker2_source;
+    //SoundSource speaker1_source;
+   
+    //SoundSource speaker2_source;
+    Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
+    shared_ptr<Model> shared_speaker_model = make_shared<Model>(speaker_model);
+    processSpeakers(all_speakers);
+    for (int i = 0; i < all_speakers.size(); i++) {
+        all_speakers[i].setModel(speaker_model);
+    }
+    for (int i = 0; i < all_speakers.size(); i++) {
+        all_speakers[i].setShader(shader);
+    }
 
+    
+    vector<SoundSource> sources;
+    for (int i = 0; i < all_speakers.size(); i++) {
+        SoundSource* source_aux = new SoundSource;
+        
+        all_speakers[i].addAudioSource(*source_aux);
+    }
+    
+
+    
+    //all_speakers[0].setModel(speaker_model);
+    //all_speakers[0].setShader(shader);
+
+
+    /*
     // init speaker1
     Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
     Speaker speaker1;
@@ -256,7 +385,10 @@ int main()
     speaker1.Translate(0.f, 0.f, 230.f);
     speaker1.Update();
 
+    all_speakers.push_back(&speaker1);
+    */
     // init speaker2
+    /*
     //Speaker speaker2;
     speaker2.setModel(speaker_model);
     speaker2.setShader(shader);
@@ -264,6 +396,8 @@ int main()
     speaker2.addSound(speaker_sound);
     // move speaker 1
     speaker2.Translate(0.f, 0.f, -400.f);
+    //all_speakers.push_back(&speaker2);
+    */
 
     // Set up camera
     //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -285,7 +419,11 @@ int main()
     //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
     
     // Speaker 1 Play
-    speaker1.Play();
+    for (Speaker& speaker : all_speakers) {
+        speaker.SetLooping(true);
+       speaker.Play();
+    }
+
     // Set up rendering
     glEnable(GL_DEPTH_TEST);
 
@@ -315,11 +453,15 @@ int main()
         sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
         sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
 
+        for (Speaker& speaker : all_speakers) {
+            speaker.Update();
+            speaker.Draw();
+        }
         // Update and Draw Speakers
-        speaker1.Update();
-        speaker2.Update();
-        speaker1.Draw();
-        speaker2.Draw();
+        //speaker1.Update();
+        //speaker2.Update();
+        //speaker1.Draw();
+        //speaker2.Draw();
 
 
 

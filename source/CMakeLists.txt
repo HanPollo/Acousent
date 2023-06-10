@@ -7,6 +7,7 @@ set(ACOUSENT_HEADERS
         "Core/TopDown.h"
         "Core/utils.h"
         "Core/Window.h"
+        "Core/Application.h"
 
         "Objects/Object.h"
         "Objects/Speaker.h"
@@ -25,6 +26,7 @@ set(ACOUSENT_HEADERS
 set(ACOUSENT_SOURCES
         "Core/utils.cpp"
         "Core/Window.cpp"
+        "Core/Application.cpp"
 
         "Objects/Object.cpp"
         "Objects/Speaker.cpp"

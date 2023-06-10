@@ -1,5 +1,5 @@
 #include "Window.h"
-#include <iostream>
+
 
 static void error_callback(int error, const char* description)
 {
@@ -81,4 +81,59 @@ double Window::getDeltaTime()
 int Window::getKey(int key)
 {
     return glfwGetKey(m_window, key);
+}
+
+void Window::setKeyCallback(GLFWkeyfun callback) {
+    m_keyCallback = callback;
+    glfwSetKeyCallback(m_window, staticKeyCallback);
+}
+
+void Window::staticKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    Window* windowInstance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    // Call the stored key callback function
+    if (windowInstance && windowInstance->m_keyCallback) {
+        windowInstance->m_keyCallback(window, key, scancode, action, mods);
+    }
+}
+void Window::setMouseCallback(GLFWcursorposfun callback) {
+    m_mouseCallback = callback;
+    glfwSetCursorPosCallback(m_window, staticMouseCallback);
+}
+
+void Window::setScrollCallback(GLFWscrollfun callback) {
+    m_scrollCallback = callback;
+    glfwSetScrollCallback(m_window, staticScrollCallback);
+}
+
+void Window::setFramebufferSizeCallback(GLFWframebuffersizefun callback) {
+    m_framebufferSizeCallback = callback;
+    glfwSetFramebufferSizeCallback(m_window, staticFramebufferSizeCallback);
+}
+
+void Window::staticMouseCallback(GLFWwindow* window, double xpos, double ypos) {
+    Window* windowInstance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    // Call the stored mouse callback function
+    if (windowInstance && windowInstance->m_mouseCallback) {
+        windowInstance->m_mouseCallback(window, xpos, ypos);
+    }
+}
+
+void Window::staticScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    Window* windowInstance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    // Call the stored scroll callback function
+    if (windowInstance && windowInstance->m_scrollCallback) {
+        windowInstance->m_scrollCallback(window, xoffset, yoffset);
+    }
+}
+
+void Window::staticFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    Window* windowInstance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    // Call the stored framebuffer size callback function
+    if (windowInstance && windowInstance->m_framebufferSizeCallback) {
+        windowInstance->m_framebufferSizeCallback(window, width, height);
+    }
 }

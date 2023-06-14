@@ -34,3 +34,6 @@
 [submodule "third_party/tsf"]
 	path = third_party/tsf
 	url = https://github.com/schellingb/TinySoundFont.git
+[submodule "third_party/rtmidi"]
+	path = third_party/rtmidi
+	url = https://github.com/thestk/rtmidi.git

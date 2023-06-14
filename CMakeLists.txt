@@ -16,14 +16,14 @@ set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gla
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/MainLoop"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/json/include"
-									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/fluidsynth/include"
+									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/tsf"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/entt/src")
 set(ACOUSENT_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/source")
 
 if(MSVC)
-    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ImGui ${BULLET_LIBRARIES} OpenAL dr_libs assimp stb OpenMeshCore nlohmann_json fluidsynth)
+    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ImGui ${BULLET_LIBRARIES} OpenAL dr_libs assimp stb OpenMeshCore nlohmann_json)
 else()
-    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ImGui ${BULLET_LIBRARIES} stdc++fs OpenAL dr_libs assimp stb OpenMeshCore nlohmann_json fluidsynth)
+    set(THIRD_PARTY_LIBRARIES glad glfw ${OPENGL_LIBRARIES} ImGui ${BULLET_LIBRARIES} stdc++fs OpenAL dr_libs assimp stb OpenMeshCore nlohmann_json)
 endif(MSVC)
 
 

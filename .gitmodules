@@ -31,3 +31,6 @@
 [submodule "third_party/fluidsynth"]
 	path = third_party/fluidsynth
 	url = https://github.com/FluidSynth/fluidsynth.git
+[submodule "third_party/tsf"]
+	path = third_party/tsf
+	url = https://github.com/schellingb/TinySoundFont.git

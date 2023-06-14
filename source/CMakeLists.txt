@@ -42,7 +42,6 @@ set(ACOUSENT_SOURCES
         "Rendering/Shader.cpp"
         #"Rendering/Texture.cpp"
         )
-
 add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS} Core/system.h ${Shaders})
 if (MSVC)
     target_compile_options(acousent PUBLIC /wd5033)

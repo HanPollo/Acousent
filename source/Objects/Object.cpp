@@ -9,7 +9,7 @@ Object::Object() //Ponerle game Object
 
 Object::~Object()
 {
-	std::cout << "ACA";
+	std::cout << "Object Destroyer" << std::endl;
 }
 
 
@@ -62,6 +62,7 @@ void Object::Play()
 		if (sounds.size() > 0) {
 			//if (!object_Asource->isPlaying())
 			object_Asource->Play(sounds.back());
+			std::cout << "Played a MIDI File" << std::endl;
 		}
 	}
 }
@@ -69,6 +70,11 @@ void Object::Play()
 void Object::SetLooping(bool loop)
 {
 	object_Asource->SetLooping(loop);
+}
+
+bool Object::isPlaying()
+{
+	return object_Asource->isPlaying();
 }
 
 void Object::Update()

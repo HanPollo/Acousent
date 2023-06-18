@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <vector>
 #include "OpenALErrorCheck.h"
+#include <iostream>
 
 static SoundDevice* _instance = nullptr;
 
@@ -146,6 +147,7 @@ SoundDevice::SoundDevice()
 
 SoundDevice::~SoundDevice()
 {
+	std::cout << "SoundDevice Destroyer" << std::endl;
 	alcMakeContextCurrent(nullptr);
 	alcDestroyContext(p_ALCContext);
 	alcCloseDevice(p_ALCDevice);

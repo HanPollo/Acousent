@@ -1,12 +1,17 @@
 #include "SoundLibrary.h"
-#include <inttypes.h>
-
 
 #define DR_WAV_IMPLEMENTATION
 #include <dr_wav.h>
 
-#include <string>
-#include <stdexcept>
+#define TSF_IMPLEMENTATION
+#include "tsf.h"
+
+#define TML_IMPLEMENTATION
+#include "tml.h"
+
+
+namespace ac = Acousent;
+
 
 /// <summary>
 /// Static class access.
@@ -77,6 +82,93 @@ ALuint SoundLibrary::Load(const char* filename)
 
 	return buffer;
 }
+
+
+
+/// <summary>
+/// Loads the sound file into memory.
+/// </summary>
+/// <param name="filename">path to the file to load</param>
+/// <returns>access id</returns>
+ALuint SoundLibrary::LoadMIDI(const char* filename)
+{
+
+	ALenum err;
+	ALuint buffer;
+
+	// Load the MIDI file
+	tml_message* context = tml_load_filename(filename);
+	if (context == NULL)
+	{
+		throw std::runtime_error(std::string("Failed to open file: ") + filename);
+	}
+
+	// Initialize the TinySoundFont library
+	tsf* soundfont = tsf_load_filename(ac::getPath("Resources/Audio/SoundFonts/ElectricPiano.sf2").string().c_str());
+	if (!soundfont)
+	{
+		tml_free(context);
+		throw std::runtime_error("Failed to load SoundFont");
+	}
+
+	// Set the sample rate
+	const unsigned int sample_rate = 44100; // Set your desired sample rate
+
+	// Generate audio data from the MIDI file using the SoundFont
+	tsf_set_output(soundfont, TSF_MONO, sample_rate, 0);
+
+
+	
+	// TML Info Variables
+	int channels;
+	int out_programs;
+	int out_total_notes;
+	unsigned int out_first_note;
+	unsigned int time_length;
+	tml_get_info(context, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length); // Adjust as needed
+	
+	const int frames = time_length * sample_rate / 1000;
+	
+	//const int frames = tml_get_remaining_time(&context, 0, INT_MAX) * sample_rate / 1000;
+	const int size = sizeof(float) * frames * 1; // Stereo audio data
+
+	float* data = new float[size];
+	tsf_render_float(soundfont, data, frames, 0);
+
+	enum class Format {
+		Mono8 = AL_FORMAT_MONO8,
+		Mono16 = AL_FORMAT_MONO16,
+		Stereo8 = AL_FORMAT_STEREO8,
+		Stereo16 = AL_FORMAT_STEREO16
+	};
+
+	// Buffer the audio data into a new buffer object
+	buffer = 0;
+	alGenBuffers(1, &buffer);
+	const auto fmt = channels == 1 ? Format::Mono16 : Format::Stereo16;
+	alBufferData(buffer, static_cast<ALenum>(fmt), data, size, sample_rate);
+
+	// Clean up memory
+	delete[] data;
+	tsf_close(soundfont);
+	tml_free(context);
+
+	// Check if an error occurred and clean up if so
+	err = alGetError();
+	if (err != AL_NO_ERROR)
+	{
+		fprintf(stderr, "OpenAL Error: %s\n", alGetString(err));
+		if (buffer && alIsBuffer(buffer))
+			alDeleteBuffers(1, &buffer);
+		return 0;
+	}
+
+	p_SoundEffectBuffers.push_back(buffer); // Add to the list of known buffers
+
+	return buffer;
+}
+
+
 
 /// <summary>
 /// Unloads the sound file from memory.

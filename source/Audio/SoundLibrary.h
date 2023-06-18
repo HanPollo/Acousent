@@ -1,6 +1,14 @@
 #pragma once
 #include <AL\al.h>
 #include <vector>
+#include <inttypes.h>
+
+#include "../root_directory.h"
+
+#include <string>
+#include <stdexcept>
+#include <fstream>
+
 
 /// <summary>
 /// SoundLibrary: Singleton class that keeps track of the shorter sounds
@@ -23,6 +31,7 @@ public:
 	static SoundLibrary* Get();
 
 	ALuint Load(const char* filename);
+	ALuint LoadMIDI(const char* filename);
 	bool UnLoad(const ALuint& bufferId);
 
 private:

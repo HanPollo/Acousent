@@ -34,6 +34,7 @@ public:
 	void Play(const ALuint& buffer_to_play);
 	void Play();
 	void SetLooping(bool loop);
+	bool isPlaying();
 
 	virtual void Update();
 

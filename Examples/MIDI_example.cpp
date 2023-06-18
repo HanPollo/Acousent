@@ -11,10 +11,12 @@
 #include <AL/alc.h>
 
 namespace ac = Acousent;
+// ac::getPath("Resources/Audio/SoundFonts/ElectricPiano.sf2").string().c_str()
 
 
 // Constants
 const int BufferSize = 22050;  // Adjust buffer size as needed
+std::vector<short> audioBuffer;
 
 // Function to handle MIDI events
 void handleMidiEvent(double deltaTime, std::vector<unsigned char>* message, void* userData)
@@ -43,14 +45,18 @@ void handleMidiEvent(double deltaTime, std::vector<unsigned char>* message, void
     // Play the note using TinySoundFont
     tsf* soundFont = static_cast<tsf*>(userData);
     tsf_channel_note_on(soundFont, channel, data1, data2);
-    short audioBuffer[BufferSize]; //synthesize 0.5 seconds
-    tsf_render_short(soundFont, audioBuffer, BufferSize, 0);
+    tsf_render_short(soundFont, audioBuffer.data(), audioBuffer.size(), 0);
 }
 
 
 
 int main()
 {
+
+    // Determine the desired buffer size
+
+    // Initialize the audio buffer with the desired size
+    audioBuffer.resize(BufferSize);
     // Initialize OpenAL
     ALCdevice* device = alcOpenDevice(nullptr);
     ALCcontext* context = alcCreateContext(device, nullptr);
@@ -84,7 +90,7 @@ int main()
 
     // Log initialization and SoundFont name
     std::cout << "TinySoundFont initialized." << std::endl;
-    std::cout << "SoundFont: " << "path/to/soundfont.sf2" << std::endl;
+    std::cout << "SoundFont: " << ac::getPath("Resources/Audio/SoundFonts/ElectricPiano.sf2").string().c_str() << std::endl;
 
     // Create OpenAL source and buffer
     ALuint buffer;
@@ -96,6 +102,8 @@ int main()
 
     // Set the audio rendering callback
     tsf_set_output(soundFont, TSF_MONO, 44100, 0); //sample rate
+    alBufferData(buffer, AL_FORMAT_MONO16, audioBuffer.data(), sizeof(audioBuffer), 44100);
+
 
     // Application loop
     bool exit = false;
@@ -107,6 +115,7 @@ int main()
         // Process MIDI event if received
         if (!message.empty()) {
             handleMidiEvent(deltaTime, &message, soundFont);
+            alSourcePlay(source);
         }
 
         // Simulate your application logic here

@@ -13,5 +13,7 @@ function(MakeExample TARGETNAME FILENAME)
 endfunction(MakeExample)
 
 add_compile_definitions(AL_LIBTYPE_STATIC)
-MakeExample(top_down top_down.cpp)
+#MakeExample(top_down top_down.cpp)
 MakeExample(midi MIDI_example.cpp)
+MakeExample(midi2 MIDI_example2.cpp)
+MakeExample(midi_lecture MIDI_Lecture.cpp)

@@ -190,57 +190,57 @@ void Acousent::Application::createAppMembers()
 
 Window Acousent::Application::getWindow()
 {
-	return Window();
+	return m_window;
 }
 
 Shader Acousent::Application::getShader()
 {
-	return Shader();
+	return m_default_shader;
 }
 
 vector<Object> Acousent::Application::getAppObjects()
 {
-	return vector<Object>();
+	return m_app_objects;
 }
 
 vector<SoundSource> Acousent::Application::getSources()
 {
-	return vector<SoundSource>();
+	return m_sound_sources;
 }
 
 vector<int> Acousent::Application::getSounds()
 {
-	return vector<int>();
+	return m_sounds;
 }
 
 SoundDevice* Acousent::Application::getSoundDevice()
 {
-	return nullptr;
+	return p_sound_device;
 }
 
 SoundLibrary* Acousent::Application::getAudioLibrary()
 {
-	return nullptr;
+	return p_audio_library;
 }
 
 ALint Acousent::Application::getAttunation()
 {
-	return ALint();
+	return m_attunation;
 }
 
 vector<Model> Acousent::Application::getModels()
 {
-	return vector<Model>();
+	return m_models;
 }
 
 json Acousent::Application::getConfig()
 {
-	return json();
+	return m_config;
 }
 
 Camera Acousent::Application::getCamera()
 {
-	return Camera();
+	return m_camera;
 }
 
 void Acousent::Application::Update()

@@ -23,6 +23,7 @@ SoundSource::SoundSource(int amount, std::vector<SoundSource*> sources)
 
 SoundSource::~SoundSource()
 {
+	std::cout << "SoundSource Destroyer" << std::endl;
 	alDeleteSources(1, &p_Source);
 }
 

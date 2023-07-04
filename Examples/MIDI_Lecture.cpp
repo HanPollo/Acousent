@@ -93,7 +93,7 @@ void processSpeakers(vector<Speaker> speakers) {
 
 
                 // Process the piano properties...
-                
+
                 //Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
                 //all_models.push_back(&speaker_model);
 
@@ -101,18 +101,18 @@ void processSpeakers(vector<Speaker> speakers) {
 
                 //SoundSource source;
                 //all_sources.push_back(&source);
-                int speaker_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/"+audioFileName).string().c_str());
+                int speaker_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/" + audioFileName).string().c_str());
                 //speaker1.setModel(speaker_model);
 
                 //speaker1.addAudioSource(source);
                 speaker1.addSound(speaker_sound);
                 //speaker1.SetLooping(true);
-                
+
                 // move speaker 1
                 speaker1.Translate(speakerX, speakerY, speakerZ);
                 speaker1.Update();
                 all_speakers.push_back(speaker1);
-                
+
 
                 std::cout << "Speaker position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
                 std::cout << "Audio file name: " << audioFileName << std::endl;
@@ -120,7 +120,7 @@ void processSpeakers(vector<Speaker> speakers) {
             }
         }
 
-      
+
 
     }
     catch (const std::exception& ex) {
@@ -339,15 +339,9 @@ int main()
     sd->SetAttunation(attunation);
     sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
     sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
-    // init SoundLibrary
-    //SoundLibrary* AudioLib = SoundLibrary::Get();
 
-    // init sounds
     int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
-    // init audio sources
-    //SoundSource speaker1_source;
-   
-    //SoundSource speaker2_source;
+
     Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
     shared_ptr<Model> shared_speaker_model = make_shared<Model>(speaker_model);
     processSpeakers(all_speakers);
@@ -358,49 +352,14 @@ int main()
         all_speakers[i].setShader(shader);
     }
 
-    
+
     vector<SoundSource> sources;
     for (int i = 0; i < all_speakers.size(); i++) {
         SoundSource* source_aux = new SoundSource;
-        
+
         all_speakers[i].addAudioSource(*source_aux);
     }
-    
 
-    
-    //all_speakers[0].setModel(speaker_model);
-    //all_speakers[0].setShader(shader);
-
-
-    /*
-    // init speaker1
-    Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
-    Speaker speaker1;
-    speaker1.setModel(speaker_model);
-    speaker1.setShader(shader);
-    speaker1.addAudioSource(speaker1_source);
-    speaker1.addSound(speaker_sound);
-    speaker1.SetLooping(true);
-    // move speaker 1
-    speaker1.Translate(0.f, 0.f, 230.f);
-    speaker1.Update();
-
-    all_speakers.push_back(&speaker1);
-    */
-    // init speaker2
-    /*
-    //Speaker speaker2;
-    speaker2.setModel(speaker_model);
-    speaker2.setShader(shader);
-    speaker2.addAudioSource(speaker2_source);
-    speaker2.addSound(speaker_sound);
-    // move speaker 1
-    speaker2.Translate(0.f, 0.f, -400.f);
-    //all_speakers.push_back(&speaker2);
-    */
-
-    // Set up camera
-    //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 
     glfwSetKeyCallback(window.getGLFWWindow(), key_callback);
@@ -417,11 +376,11 @@ int main()
 
     // Set up theater:
     //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
-    
+
     // Speaker 1 Play
     for (Speaker& speaker : all_speakers) {
         //speaker.SetLooping(true);
-       speaker.Play();
+        speaker.Play();
     }
 
     // Set up rendering
@@ -432,7 +391,7 @@ int main()
         // Update camera
         float deltaTime = window.getDeltaTime();
         camera.processMovement(deltaTime);
-        std::cout << all_speakers[0].isPlaying();
+        //std::cout << all_speakers[0].isPlaying();
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -457,23 +416,6 @@ int main()
             speaker.Update();
             speaker.Draw();
         }
-        // Update and Draw Speakers
-        //speaker1.Update();
-        //speaker2.Update();
-        //speaker1.Draw();
-        //speaker2.Draw();
-
-
-
-        /*
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        renderImGui();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        */
-        // Swap buffers and poll events
         window.swapBuffers();
         window.pollEvents();
     }

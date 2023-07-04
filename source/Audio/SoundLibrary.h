@@ -1,5 +1,6 @@
 #pragma once
 #include <AL\al.h>
+#include <AL/alext.h>
 #include <vector>
 #include <inttypes.h>
 

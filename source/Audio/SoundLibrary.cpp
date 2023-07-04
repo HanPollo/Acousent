@@ -8,9 +8,11 @@
 
 #define TML_IMPLEMENTATION
 #include "tml.h"
+#include <iostream>
 
 
 namespace ac = Acousent;
+using namespace std;
 
 
 /// <summary>
@@ -125,12 +127,21 @@ ALuint SoundLibrary::LoadMIDI(const char* filename)
 	int out_total_notes;
 	unsigned int out_first_note;
 	unsigned int time_length;
-	tml_get_info(context, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length); // Adjust as needed
+	tml_get_info(context, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length);
+
+	cout << "Channels: " << channels << endl;
+	cout << "Programs: " << out_programs << endl;
+	cout << "Total notes: " << out_total_notes << endl;
+	cout << "First note: " << out_first_note << endl;
+	cout << "Time length: " << time_length << endl;
 	
-	const int frames = time_length * sample_rate / 1000;
+	const int frames = time_length * sample_rate / 1000; // Porque time_length esta en milisegundos y samplerate en Hz.
 	
 	//const int frames = tml_get_remaining_time(&context, 0, INT_MAX) * sample_rate / 1000;
-	const int size = sizeof(float) * frames * 1; // Stereo audio data
+	const int size = sizeof(float) * frames * 1; // MONO audio data (Stereo seria *2)
+
+	cout << "Frames: " << frames << endl;
+	cout << "Size: " << size << endl;
 
 	float* data = new float[size];
 	tsf_render_float(soundfont, data, frames, 0);
@@ -139,14 +150,18 @@ ALuint SoundLibrary::LoadMIDI(const char* filename)
 		Mono8 = AL_FORMAT_MONO8,
 		Mono16 = AL_FORMAT_MONO16,
 		Stereo8 = AL_FORMAT_STEREO8,
-		Stereo16 = AL_FORMAT_STEREO16
+		Stereo16 = AL_FORMAT_STEREO16,
+		Mono32 = AL_FORMAT_MONO_FLOAT32,
+		Stereo32 = AL_FORMAT_STEREO_FLOAT32
 	};
 
 	// Buffer the audio data into a new buffer object
 	buffer = 0;
 	alGenBuffers(1, &buffer);
-	const auto fmt = channels == 1 ? Format::Mono16 : Format::Stereo16;
-	alBufferData(buffer, static_cast<ALenum>(fmt), data, size, sample_rate);
+	auto fmt = 1;
+	Format format;
+	fmt == 1 ? format = Format::Mono32 :  format = Format::Stereo32;
+	alBufferData(buffer, static_cast<ALenum>(format), data, size, sample_rate); // ACA el error
 
 	// Clean up memory
 	delete[] data;
@@ -154,6 +169,7 @@ ALuint SoundLibrary::LoadMIDI(const char* filename)
 	tml_free(context);
 
 	// Check if an error occurred and clean up if so
+	cout << "Format: " << static_cast<ALenum>(format) << endl;
 	err = alGetError();
 	if (err != AL_NO_ERROR)
 	{

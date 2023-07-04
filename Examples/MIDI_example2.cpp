@@ -63,12 +63,13 @@ int main(int argc, char* argv[])
     alGenSources(1, &source);
 
     // Initialize the buffers with silence
+    
     float silence[4096] = { 0.0f };
     for (int i = 0; i < numBuffers; ++i)
     {
         alBufferData(buffers[i], AL_FORMAT_STEREO_FLOAT32, silence, sizeof(silence), 44100);
     }
-
+    
     // Queue the buffers to the source
     alSourceQueueBuffers(source, numBuffers, buffers);
 
@@ -120,9 +121,9 @@ int main(int argc, char* argv[])
 
         // Delay for the desired note duration
 #ifdef _WIN32
-        Sleep(2000); // Windows: Sleep for 2000 milliseconds (2 seconds)
+        Sleep(1000); // Windows: Sleep for 1000 milliseconds (1 seconds)
 #else
-        usleep(2000000); // Linux: Sleep for 2000000 microseconds (2 seconds)
+        usleep(1000000); // Linux: Sleep for 1000000 microseconds (1 seconds)
 #endif
     }
 

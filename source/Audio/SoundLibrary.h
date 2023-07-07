@@ -1,6 +1,7 @@
 #pragma once
 #include <AL\al.h>
 #include <AL/alext.h>
+
 #include <vector>
 #include <inttypes.h>
 
@@ -32,7 +33,7 @@ public:
 	static SoundLibrary* Get();
 
 	ALuint Load(const char* filename);
-	ALuint LoadMIDI(const char* filename);
+	ALuint LoadMIDI(const char* midi, const char* sf2);
 	bool UnLoad(const ALuint& bufferId);
 
 private:
@@ -40,5 +41,12 @@ private:
 	~SoundLibrary();
 
 	std::vector<ALuint> p_SoundEffectBuffers;
+
+	// Sample rate es la cantidad de samples que se requieren. Mientras mas samples mejor la calidad del audio pero mas memoria se utiliza.
+	// En general se utiliza 44100 samples o 44.1kHz de Sample Rate ya que este es el sample rate de los CDs clasicos.
+	// En caso de que se requiera una mejor calidad de audio o peor, si se pierden notas se debe incrementar el sample Rate.
+	const int sampleRate = 44100.0;
+
+	
 };
 

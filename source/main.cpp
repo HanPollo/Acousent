@@ -51,6 +51,7 @@ int seatColumn = 1;
 
 //Speaker speaker2;
 vector<Speaker> all_speakers;
+vector<Speaker> all_instruments;
 vector<SoundSource*> all_sources;
 vector<Model*> all_models;
 SoundLibrary* AudioLib = SoundLibrary::Get();
@@ -79,9 +80,8 @@ void getAllJSONKeys(const json& jsonObject, std::vector<std::string>& keys) {
 //End JSON Config
 
 // Process speakers from json
-void processSpeakers(vector<Speaker> speakers) {
+void processSpeakers(vector<Speaker> speakers, json distribution) {
     try {
-        json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution.json").string()); //Se deberia recibir como parametro.
         // Access the speaker objects in the array
         if (distribution.contains("speakers") && distribution["speakers"].is_array()) {
             for (const auto& speaker : distribution["speakers"]) {
@@ -114,13 +114,62 @@ void processSpeakers(vector<Speaker> speakers) {
                 all_speakers.push_back(speaker1);
                 
 
-                std::cout << "Piano position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
+                std::cout << "Speaker position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
                 std::cout << "Audio file name: " << audioFileName << std::endl;
                 std::cout << std::endl;
             }
         }
 
       
+
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << std::endl;
+    }
+}
+
+// Process instruments from json
+void processInstruments(vector<Speaker> speakers, json distribution) {
+    try {
+        // Access the speaker objects in the array
+        if (distribution.contains("instruments") && distribution["instruments"].is_array()) {
+            for (const auto& speaker : distribution["instruments"]) {
+                // Access the properties of each piano object
+                float speakerX = speaker["position"]["x"];
+                float speakerY = speaker["position"]["y"];
+                float speakerZ = speaker["position"]["z"];
+                std::string midiFileName = speaker["midi_file"];
+                int midiTrack = speaker["midi_track"];
+                std::string sfFileName = speaker["soundfont_file"];
+                int sfPreset = speaker["soundfont_preset"];
+
+                Speaker speaker1;
+
+                //SoundSource source;
+                //all_sources.push_back(&source);
+                int speaker_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/" + midiFileName).string().c_str(), ac::getPath("Resources/Audio/SoundFonts/" + sfFileName).string().c_str());
+                //speaker1.setModel(speaker_model);
+
+                //speaker1.addAudioSource(source);
+                speaker1.addSound(speaker_sound);
+                //speaker1.SetLooping(true);
+
+                // move speaker 1
+                speaker1.Translate(speakerX, speakerY, speakerZ);
+                speaker1.Update();
+                all_instruments.push_back(speaker1);
+
+
+                std::cout << "Piano position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
+                std::cout << "Midi file name: " << midiFileName << std::endl;
+                std::cout << "Midi track: " << midiTrack << std::endl;
+                std::cout << "SoundFont file name: " << sfFileName << std::endl;
+                std::cout << "SoundFont preset: " << sfPreset << std::endl;
+                std::cout << std::endl;
+            }
+        }
+
+
 
     }
     catch (const std::exception& ex) {
@@ -339,18 +388,19 @@ int main()
     sd->SetAttunation(attunation);
     sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
     sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
-    // init SoundLibrary
-    //SoundLibrary* AudioLib = SoundLibrary::Get();
+
+    // json config file
+    json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution.json").string());
 
     // init sounds
     int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
     // init audio sources
     //SoundSource speaker1_source;
    
-    //SoundSource speaker2_source;
+    //Speakers;
     Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
     shared_ptr<Model> shared_speaker_model = make_shared<Model>(speaker_model);
-    processSpeakers(all_speakers);
+    processSpeakers(all_speakers, distribution);
     for (int i = 0; i < all_speakers.size(); i++) {
         all_speakers[i].setModel(speaker_model);
     }
@@ -359,50 +409,31 @@ int main()
     }
 
     
-    vector<SoundSource> sources;
+    vector<SoundSource> sources_speakers;
     for (int i = 0; i < all_speakers.size(); i++) {
-        SoundSource* source_aux = new SoundSource;
+        SoundSource* source_speaker = new SoundSource;
         
-        all_speakers[i].addAudioSource(*source_aux);
+        all_speakers[i].addAudioSource(*source_speaker);
+    }
+
+    //Instruments;
+    Model instrument_model(ac::getPath("Resources/Models/Piano/scene.gltf").string());
+    shared_ptr<Model> shared_instrument_model = make_shared<Model>(instrument_model);
+    processInstruments(all_instruments, distribution);
+    for (int i = 0; i < all_instruments.size(); i++) {
+        all_instruments[i].setModel(instrument_model);
+    }
+    for (int i = 0; i < all_instruments.size(); i++) {
+        all_instruments[i].setShader(shader);
+    }
+
+    vector<SoundSource> sources_instrum;
+    for (int i = 0; i < all_instruments.size(); i++) {
+        SoundSource* source_instrum = new SoundSource;
+
+        all_instruments[i].addAudioSource(*source_instrum);
     }
     
-
-    
-    //all_speakers[0].setModel(speaker_model);
-    //all_speakers[0].setShader(shader);
-
-
-    /*
-    // init speaker1
-    Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
-    Speaker speaker1;
-    speaker1.setModel(speaker_model);
-    speaker1.setShader(shader);
-    speaker1.addAudioSource(speaker1_source);
-    speaker1.addSound(speaker_sound);
-    speaker1.SetLooping(true);
-    // move speaker 1
-    speaker1.Translate(0.f, 0.f, 230.f);
-    speaker1.Update();
-
-    all_speakers.push_back(&speaker1);
-    */
-    // init speaker2
-    /*
-    //Speaker speaker2;
-    speaker2.setModel(speaker_model);
-    speaker2.setShader(shader);
-    speaker2.addAudioSource(speaker2_source);
-    speaker2.addSound(speaker_sound);
-    // move speaker 1
-    speaker2.Translate(0.f, 0.f, -400.f);
-    //all_speakers.push_back(&speaker2);
-    */
-
-    // Set up camera
-    //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
-
     glfwSetKeyCallback(window.getGLFWWindow(), key_callback);
     glfwSetCursorPosCallback(window.getGLFWWindow(), mouse_callback);
     glfwSetScrollCallback(window.getGLFWWindow(), scroll_callback);
@@ -419,9 +450,16 @@ int main()
     //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
     
     // Speaker 1 Play
+    /*
     for (Speaker& speaker : all_speakers) {
         speaker.SetLooping(true);
        speaker.Play();
+    }
+    */
+
+    for (Speaker& instrument : all_instruments) {
+        instrument.SetLooping(true);
+        instrument.Play();
     }
 
     // Set up rendering
@@ -457,23 +495,12 @@ int main()
             speaker.Update();
             speaker.Draw();
         }
-        // Update and Draw Speakers
-        //speaker1.Update();
-        //speaker2.Update();
-        //speaker1.Draw();
-        //speaker2.Draw();
 
-
-
-        /*
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        renderImGui();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        */
-        // Swap buffers and poll events
+        for (Speaker& instrument : all_instruments) {
+            instrument.Update();
+            instrument.Draw();
+        }
+        
         window.swapBuffers();
         window.pollEvents();
     }

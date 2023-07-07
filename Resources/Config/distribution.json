@@ -1,40 +1,47 @@
 {
-    "speakers": [
-        {
-			"id": 1,
-            "position": {
-                "x": 0.0,
-                "y": 30.0,
-                "z": 230.0
-            },
-            "audio_file": "Sound1_R.wav"
-        },
-        {
-			"id": 2,
-            "position": {
-                "x": 0.0,
-                "y": 30.0,
-                "z": 0.0
-            },
-            "audio_file": "Sound1_R.wav"
-        },
-		{
-			"id": 3,
-            "position": {
-                "x": 0.0,
-                "y": 200.0,
-                "z": -230.0
-            },
-            "audio_file": "Sound1_R.wav"
-        },
-        {
-			"id": 4,
-            "position": {
-                "x": 0.0,
-                "y": 200.0,
-                "z": -400.0
-            },
-            "audio_file": "Sound1_R.wav"
-        }
-    ]
+  "speakers": [
+    {
+      "id": 2,
+      "position": {
+        "x": 0.0,
+        "y": 30.0,
+        "z": 0.0
+      },
+      "audio_file": "Sound1_R.wav"
+    },
+    {
+      "id": 3,
+      "position": {
+        "x": 0.0,
+        "y": 200.0,
+        "z": -230.0
+      },
+      "audio_file": "Sound1_R.wav"
+    },
+    {
+      "id": 4,
+      "position": {
+        "x": 0.0,
+        "y": 200.0,
+        "z": -400.0
+      },
+      "audio_file": "Sound1_R.wav"
+    }
+  ],
+
+  "instruments": [
+    {
+      "id": 1,
+      "position": {
+        "x": 0.0,
+        "y": 30.0,
+        "z": 230.0
+      },
+      "midi_file": "midi_example.mid",
+      "midi_track": 3,
+      "soundfont_file": "ElectricPiano.sf2",
+      "soundfont_preset": 1
+    }
+    
+  ]
 }

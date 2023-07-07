@@ -8,11 +8,105 @@
 
 #define TML_IMPLEMENTATION
 #include "tml.h"
+
 #include <iostream>
 
 
 namespace ac = Acousent;
 using namespace std;
+
+
+// El soundfont que se utilizara. Esto tiene que ser global para que se pueda ir cambiando entre distintos presets (instrumentos) 
+// dentro del mismo archivo .sf2 
+static tsf* g_TinySoundFont;
+
+// Lo mismo para los MIDI ya que estos pueden contener varios tracks
+static double g_Msec;               // Tiempo actual de playback
+static tml_message* g_MidiMessage;  // Proximo mensaje MIDI a leer
+
+// Un entero estilo contador para ver cuantas iteraciones de los loops se estan realizando asi compararlo con la cantidad necesaria.
+int test_int = 0;
+
+// Esta es la funcion principal para la lectura de archivos MIDI. Lee los archivos y crea un buffer que lo guarda en el puntero audioStream.
+void ProcessMIDIAndRender(float* audioStream, int streamLength)
+{
+	// El archivo MIDI se tiene que leer por bloques.
+	int sampleBlock, sampleCount = streamLength / (1 * sizeof(float)); // La multiplicacion por 1 es por la cantidad de canales (MONO en este caso)
+
+	// Iteracion por bloque
+	for (sampleBlock = TSF_RENDER_EFFECTSAMPLEBLOCK; sampleCount > 0; sampleCount -= sampleBlock)
+	{
+		// Esto para que cuando el bloque sea mayor a los samples restantes no solo utilice un bloque del tamano de los restantes.
+		if (sampleBlock > sampleCount)
+			sampleBlock = sampleCount;
+
+		// Se procesa el MIDI con los parametros necesarios y para cada senal que entrega el MIDI el soundfont debe realizar una accion.
+		for (g_Msec += sampleBlock * (1000.0 / 44100.0); g_MidiMessage && g_Msec >= g_MidiMessage->time; g_MidiMessage = g_MidiMessage->next)
+		{
+			switch (g_MidiMessage->type)
+			{
+			case TML_PROGRAM_CHANGE:
+				// Si el MIDI tiene algun numero de preset especifico para elegir instrumento se detecta aca y se cambia el preset del soundfont
+				tsf_channel_set_presetnumber(g_TinySoundFont, g_MidiMessage->channel, g_MidiMessage->program, (g_MidiMessage->channel == 9));
+				break;
+			case TML_NOTE_ON:
+				// Nota ON
+				tsf_channel_note_on(g_TinySoundFont, g_MidiMessage->channel, g_MidiMessage->key, g_MidiMessage->velocity / 127.0f);
+				break;
+			case TML_NOTE_OFF:
+				// Nota OFF
+				tsf_channel_note_off(g_TinySoundFont, g_MidiMessage->channel, g_MidiMessage->key);
+				break;
+			case TML_PITCH_BEND:
+				// Si hay cambios de tonos se deben ajustar en el soundfont para tener la nota correcta para esa nota en el MIDI.
+				tsf_channel_set_pitchwheel(g_TinySoundFont, g_MidiMessage->channel, g_MidiMessage->pitch_bend);
+				break;
+			case TML_CONTROL_CHANGE:
+				// La libreria tiny sound font recibe los mensajes de controllador MIDI si esque hay cambios.
+				tsf_channel_midi_control(g_TinySoundFont, g_MidiMessage->channel, g_MidiMessage->control, g_MidiMessage->control_value);
+				break;
+			}
+		}
+
+		// La siguiente linea de codigo crea el audio a partir de valores float y los guarda en el puntero audioStream.
+		// Esto lo realiza.
+		tsf_render_float(g_TinySoundFont, audioStream, sampleBlock, 0);
+		// Contador para efectos de Debug
+		test_int++;
+		if (test_int > 2267) {
+			//cout << "Test_int es maypr a 2267" << endl;
+			//auto float_size = sizeof(float);
+			//cout << "Float size: " << float_size << endl;
+		}
+		// Se deben calcular cuantos bytes se procesaron para asi avanzar el puntero al siguiente lugar en memoria donde se continuara la cancion.
+		int blockSizeBytes = sampleBlock * (1 * sizeof(float));
+
+		// Incrementar el puntero por la cantidad de samples procesados.
+		audioStream += blockSizeBytes / sizeof(unsigned int);
+
+	}
+}
+
+// Esta funcion utiliza el archivo midi y el sample rate para poder dividir el archivo en bloques.
+int CalculateStreamLength(double sampleRate)
+{
+	int maxTimestamp = 0;
+
+	// Itera los mensajes MIDI y encuentra el mayor largo de los tracks. (Esto sera el largo completo ya que los tracks siempre parten del principio).
+	for (tml_message* message = g_MidiMessage; message != NULL; message = message->next)
+	{
+		if (message->time > maxTimestamp)
+		{
+			maxTimestamp = message->time;
+		}
+	}
+
+	// Se calcula streamLength (largo del puntero para el buffer) utilizando el sample rate y el mayor tiempo de los tracks 
+	// (Dividio por 1000 ya que se requieren segundos)
+	int streamLength = (int)(maxTimestamp * sampleRate / 1000.0) * (1 * sizeof(float)); // 1 Channel
+
+	return streamLength;
+}
 
 
 /// <summary>
@@ -92,33 +186,45 @@ ALuint SoundLibrary::Load(const char* filename)
 /// </summary>
 /// <param name="filename">path to the file to load</param>
 /// <returns>access id</returns>
-ALuint SoundLibrary::LoadMIDI(const char* filename)
+ALuint SoundLibrary::LoadMIDI(const char* midi, const char* sf2)
 {
 
 	ALenum err;
-	ALuint buffer;
+	tml_message* TinyMidiLoader = nullptr;
 
-	// Load the MIDI file
-	tml_message* context = tml_load_filename(filename);
-	if (context == NULL)
+	// Cargar el soundfont desde el archivo.
+	g_TinySoundFont = tsf_load_filename(sf2);
+	if (!g_TinySoundFont)
 	{
-		throw std::runtime_error(std::string("Failed to open file: ") + filename);
+		fprintf(stderr, "Could not load SoundFont\n");
+		return 1;
 	}
 
-	// Initialize the TinySoundFont library
-	tsf* soundfont = tsf_load_filename(ac::getPath("Resources/Audio/SoundFonts/ElectricPiano.sf2").string().c_str());
-	if (!soundfont)
+	// Inicializa el preset en el canal especial numero 10 del MIDI para utilizar el banco de sonidos de percucion del soundfont (128) si lo tiene
+	tsf_channel_set_bank_preset(g_TinySoundFont, 9, 128, 0);
+
+	// Le indicamos a tsf los parametros de rendering del audio.
+	tsf_set_output(g_TinySoundFont, TSF_MONO, sampleRate, 0.0f); // Hay que 
+
+	// Cargamos el archivo MIDI
+	TinyMidiLoader = tml_load_filename(midi);
+	if (!TinyMidiLoader)
 	{
-		tml_free(context);
-		throw std::runtime_error("Failed to load SoundFont");
+		fprintf(stderr, "Could not load MIDI file\n");
+		return 1;
 	}
 
-	// Set the sample rate
-	const unsigned int sample_rate = 44100; // Set your desired sample rate
+	// Inicializamos el midi loader global en el primer mensaje de nuestro archivo cargado.
+	// Esto para que la funcion pueda utilizar el midi correcto.
+	g_MidiMessage = TinyMidiLoader;
 
-	// Generate audio data from the MIDI file using the SoundFont
-	tsf_set_output(soundfont, TSF_MONO, sample_rate, 0);
+	// Calculamos el largo necesario del buffer de audio.
+	auto streamLength = CalculateStreamLength(sampleRate);
+	// Alocamos la memoria necesaria para el buffer completo en forma de arreglo.
+	float* audioStream = new float[streamLength / sizeof(float)];
 
+	// Procesamos el midi con el soundfont elegido y lo guardamos en audioStream
+	ProcessMIDIAndRender(audioStream, streamLength);
 
 	
 	// TML Info Variables
@@ -127,7 +233,7 @@ ALuint SoundLibrary::LoadMIDI(const char* filename)
 	int out_total_notes;
 	unsigned int out_first_note;
 	unsigned int time_length;
-	tml_get_info(context, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length);
+	tml_get_info(g_MidiMessage, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length);
 
 	cout << "Channels: " << channels << endl;
 	cout << "Programs: " << out_programs << endl;
@@ -135,51 +241,17 @@ ALuint SoundLibrary::LoadMIDI(const char* filename)
 	cout << "First note: " << out_first_note << endl;
 	cout << "Time length: " << time_length << endl;
 	
-	const int frames = time_length * sample_rate / 1000; // Porque time_length esta en milisegundos y samplerate en Hz.
-	
-	//const int frames = tml_get_remaining_time(&context, 0, INT_MAX) * sample_rate / 1000;
-	const int size = sizeof(float) * frames * 1; // MONO audio data (Stereo seria *2)
-
-	cout << "Frames: " << frames << endl;
-	cout << "Size: " << size << endl;
-
-	float* data = new float[size];
-	tsf_render_float(soundfont, data, frames, 0);
-
-	enum class Format {
-		Mono8 = AL_FORMAT_MONO8,
-		Mono16 = AL_FORMAT_MONO16,
-		Stereo8 = AL_FORMAT_STEREO8,
-		Stereo16 = AL_FORMAT_STEREO16,
-		Mono32 = AL_FORMAT_MONO_FLOAT32,
-		Stereo32 = AL_FORMAT_STEREO_FLOAT32
-	};
-
-	// Buffer the audio data into a new buffer object
-	buffer = 0;
+	// Creamos el buffer de OpenAL utilizando el buffer audioStream para la informacion del audio.
+	ALuint buffer;
 	alGenBuffers(1, &buffer);
-	auto fmt = 1;
-	Format format;
-	fmt == 1 ? format = Format::Mono32 :  format = Format::Stereo32;
-	alBufferData(buffer, static_cast<ALenum>(format), data, size, sample_rate); // ACA el error
-
-	// Clean up memory
-	delete[] data;
-	tsf_close(soundfont);
-	tml_free(context);
-
-	// Check if an error occurred and clean up if so
-	cout << "Format: " << static_cast<ALenum>(format) << endl;
-	err = alGetError();
-	if (err != AL_NO_ERROR)
-	{
-		fprintf(stderr, "OpenAL Error: %s\n", alGetString(err));
-		if (buffer && alIsBuffer(buffer))
-			alDeleteBuffers(1, &buffer);
-		return 0;
-	}
+	alBufferData(buffer, AL_FORMAT_MONO_FLOAT32, audioStream, static_cast<ALsizei>(streamLength), sampleRate);
 
 	p_SoundEffectBuffers.push_back(buffer); // Add to the list of known buffers
+
+	//Cleanup
+	delete[] audioStream;
+	tsf_close(g_TinySoundFont);
+	tml_free(TinyMidiLoader);
 
 	return buffer;
 }

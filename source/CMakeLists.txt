@@ -11,6 +11,7 @@ set(ACOUSENT_HEADERS
 
         "Objects/Object.h"
         "Objects/Speaker.h"
+        "Objects/Instrument.h"
         "Objects/Seat.h"
         "Objects/SeatCoords.h"
 
@@ -30,6 +31,7 @@ set(ACOUSENT_SOURCES
 
         "Objects/Object.cpp"
         "Objects/Speaker.cpp"
+        "Objects/Instrument.cpp"
         "Objects/Seat.cpp"
 
         "Audio/SoundDevice.cpp"

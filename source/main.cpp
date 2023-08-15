@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -25,6 +27,7 @@
 #include "Core/Window.h"
 
 #include "Objects/Speaker.h"
+#include "Objects/Instrument.h"
 #include "Objects/Seat.h"
 
 #include "Audio/SoundDevice.h"
@@ -51,7 +54,7 @@ int seatColumn = 1;
 
 //Speaker speaker2;
 vector<Speaker> all_speakers;
-vector<Speaker> all_instruments;
+vector<Instrument> all_instruments;
 vector<SoundSource*> all_sources;
 vector<Model*> all_models;
 SoundLibrary* AudioLib = SoundLibrary::Get();
@@ -129,42 +132,56 @@ void processSpeakers(vector<Speaker> speakers, json distribution) {
 }
 
 // Process instruments from json
-void processInstruments(vector<Speaker> speakers, json distribution) {
+void processInstruments(vector<Instrument> instruments, json distribution) {
     try {
-        // Access the speaker objects in the array
+        // Access the instrument objects in the array
         if (distribution.contains("instruments") && distribution["instruments"].is_array()) {
-            for (const auto& speaker : distribution["instruments"]) {
+            for (const auto& instrument : distribution["instruments"]) {
                 // Access the properties of each piano object
-                float speakerX = speaker["position"]["x"];
-                float speakerY = speaker["position"]["y"];
-                float speakerZ = speaker["position"]["z"];
-                std::string midiFileName = speaker["midi_file"];
-                int midiTrack = speaker["midi_track"];
-                std::string sfFileName = speaker["soundfont_file"];
-                int sfPreset = speaker["soundfont_preset"];
+                float instrumentX = instrument["position"]["x"];
+                float instrumentY = instrument["position"]["y"];
+                float instrumentZ = instrument["position"]["z"];
+                std::string midiFileName = instrument["midi_file"];
+                std::string sfFileName = instrument["soundfont_file"];
+                int sfPreset = -1;
+                int midiTrack = -1;
+                bool singleTrack = false;
+                if (instrument.contains("midi_track") && instrument.contains("soundfont_preset"))
+                    singleTrack = true;
 
-                Speaker speaker1;
+                if (singleTrack) {
+                    midiTrack = instrument["midi_track"];
+                    sfPreset = instrument["soundfont_preset"];
+                }
+
+                Instrument instrument1;
 
                 //SoundSource source;
                 //all_sources.push_back(&source);
-                int speaker_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/" + midiFileName).string().c_str(), ac::getPath("Resources/Audio/SoundFonts/" + sfFileName).string().c_str());
-                //speaker1.setModel(speaker_model);
+                int instrument_sound;
+                //this_thread::sleep_for(chrono::milliseconds(1000));
+                if (singleTrack)
+                    instrument_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/" + midiFileName).string().c_str(), ac::getPath("Resources/Audio/SoundFonts/" + sfFileName).string().c_str(), 1, midiTrack, sfPreset);
+                else
+                    instrument_sound = AudioLib->LoadMIDI(ac::getPath("Resources/Audio/MIDI/" + midiFileName).string().c_str(), ac::getPath("Resources/Audio/SoundFonts/" + sfFileName).string().c_str());
 
-                //speaker1.addAudioSource(source);
-                speaker1.addSound(speaker_sound);
-                //speaker1.SetLooping(true);
+                //instrument1.addAudioSource(source);
+                instrument1.addSound(instrument_sound);
+                //instrument1.SetLooping(true);
 
-                // move speaker 1
-                speaker1.Translate(speakerX, speakerY, speakerZ);
-                speaker1.Update();
-                all_instruments.push_back(speaker1);
+                // move instrument 1
+                instrument1.Translate(instrumentX, instrumentY, instrumentZ);
+                instrument1.Update();
+                all_instruments.push_back(instrument1);
 
 
-                std::cout << "Piano position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
+                std::cout << "Piano position: X=" << instrumentX << ", Y=" << instrumentY << ", Z=" << instrumentZ << std::endl;
                 std::cout << "Midi file name: " << midiFileName << std::endl;
-                std::cout << "Midi track: " << midiTrack << std::endl;
+                if(singleTrack)
+                    std::cout << "Midi track: " << midiTrack << std::endl;
                 std::cout << "SoundFont file name: " << sfFileName << std::endl;
-                std::cout << "SoundFont preset: " << sfPreset << std::endl;
+                if(singleTrack)
+                    std::cout << "SoundFont preset: " << sfPreset << std::endl;
                 std::cout << std::endl;
             }
         }
@@ -390,7 +407,7 @@ int main()
     sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
 
     // json config file
-    json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution.json").string());
+    json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution2.json").string());
 
     // init sounds
     int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
@@ -450,17 +467,19 @@ int main()
     //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
     
     // Speaker 1 Play
-    /*
+    
     for (Speaker& speaker : all_speakers) {
         speaker.SetLooping(true);
        speaker.Play();
     }
-    */
+    
 
-    for (Speaker& instrument : all_instruments) {
+
+    for (Instrument& instrument : all_instruments) {
         instrument.SetLooping(true);
         instrument.Play();
     }
+
 
     // Set up rendering
     glEnable(GL_DEPTH_TEST);
@@ -496,7 +515,7 @@ int main()
             speaker.Draw();
         }
 
-        for (Speaker& instrument : all_instruments) {
+        for (Instrument& instrument : all_instruments) {
             instrument.Update();
             instrument.Draw();
         }

@@ -33,8 +33,10 @@ public:
 	static SoundLibrary* Get();
 
 	ALuint Load(const char* filename);
-	ALuint LoadMIDI(const char* midi, const char* sf2);
+	ALuint LoadMIDI(const char* midi, const char* sf2, bool singleTrack = 0, int trackNum = 0, int soundNum = 0);
 	bool UnLoad(const ALuint& bufferId);
+
+	bool loading = false;
 
 private:
 	SoundLibrary();

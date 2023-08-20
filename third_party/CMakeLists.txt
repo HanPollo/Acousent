@@ -1,3 +1,5 @@
+
+
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
 define_property(
     TARGET
@@ -13,6 +15,8 @@ function(add_subdirectory_with_folder _folder_name _folder)
 endfunction()
 
 
+
+add_subdirectory_with_folder("third_party" rtmidi)
 add_subdirectory_with_folder("third_party" glad)
 add_subdirectory_with_folder("third_party" glfw)
 add_subdirectory_with_folder("third_party" imgui-1.78)
@@ -21,7 +25,7 @@ add_subdirectory_with_folder("third_party/OpenMesh" openmesh)
 add_subdirectory_with_folder("third_party/Assimp" assimp)
 add_subdirectory_with_folder("third_party" stb)
 add_subdirectory_with_folder("third_party" json)
-add_subdirectory_with_folder("third_party" rtmidi)
+
 
 
 

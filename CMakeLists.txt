@@ -4,7 +4,8 @@ project(acousent C CXX)
 
 find_package(OpenGL REQUIRED)
 #add_definitions(-D_USE_MATH_DEFINES)
-set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include"
+set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/rtmidi"
+									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw/include"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/glm"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui-1.78"
@@ -17,7 +18,6 @@ set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/gla
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/MainLoop"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/json/include"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/tsf"
-									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/rtmidi"
 									"${CMAKE_CURRENT_SOURCE_DIR}/third_party/entt/src")
 set(ACOUSENT_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/source")
 

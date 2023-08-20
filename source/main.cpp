@@ -112,12 +112,14 @@ void processSpeakers(vector<Speaker> speakers, json distribution) {
                 //speaker1.SetLooping(true);
                 
                 // move speaker 1
-                speaker1.Translate(speakerX, speakerY, speakerZ);
+                speaker1.Translate(speakerX*24.29f, speakerY * 24.29f, speakerZ * 24.29f);
                 speaker1.Update();
                 all_speakers.push_back(speaker1);
                 
-
+               
                 std::cout << "Speaker position: X=" << speakerX << ", Y=" << speakerY << ", Z=" << speakerZ << std::endl;
+                glm::vec3 pos = speaker1.getPosition();
+                std::cout << "Speaker real position: X=" << pos[0] << ", Y=" << pos[1] << ", Z=" << pos[2] << std::endl;
                 std::cout << "Audio file name: " << audioFileName << std::endl;
                 std::cout << std::endl;
             }
@@ -176,6 +178,8 @@ void processInstruments(vector<Instrument> instruments, json distribution) {
 
 
                 std::cout << "Piano position: X=" << instrumentX << ", Y=" << instrumentY << ", Z=" << instrumentZ << std::endl;
+                glm::vec3 pos = instrument1.getPosition();
+                std::cout << "Instrument real position: X=" << pos[0] << ", Y=" << pos[1] << ", Z=" << pos[2] << std::endl;
                 std::cout << "Midi file name: " << midiFileName << std::endl;
                 if(singleTrack)
                     std::cout << "Midi track: " << midiTrack << std::endl;
@@ -213,84 +217,10 @@ void setSoundSourcesToInstruments(vector<Object*> instruments) {
         instrument->addAudioSource(source);
 
         //speaker1.addSound(speaker_sound);
-        instrument->SetLooping(true);
+        instrument->SetLooping();
     }
 }
 
-// end instrument process
-GLuint RenderToTexture()
-{
-    GLuint fbo, texture;
-
-    // Create framebuffer object
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    // Create texture object
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Attach texture to framebuffer object
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-    // Check for framebuffer completeness
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE)
-    {
-        printf("Framebuffer incomplete: %x\n", status);
-        exit(1);
-    }
-
-    // Render your scene to the FBO
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // ...render your scene here...
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // Return the texture ID
-    return texture;
-}
-
-void renderImGui() {
-    // ImGUI related
-
-    ImGui::Begin("Main Window");
-
-    // Render your OpenGL output to a texture
-    GLuint textureID = RenderToTexture();
-
-    // Display the texture inside an ImGui window
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImGui::Image((void*)(intptr_t)textureID, windowSize);
-
-    // Add other viewports
-    //if (ImGui::Begin("Side Viewport", nullptr, ImGuiWindowFlags_NoScrollbar)) {
-        // Render your other viewport here
-    //}
-    //ImGui::End();
-
-    // Add a main menu
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            // Add menu items for File
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit")) {
-            // Add menu items for Edit
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("View")) {
-            // Add menu items for View
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
-
-    ImGui::End();
-
-}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -300,35 +230,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
         //speaker2.Play();
 
-    //Camera position
+    //Play sounds
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-        string Sname = std::to_string(seatRow) + std::to_string(seatColumn);
-        Seat seat = Seat(Sname, camera.position_);
-        seat.AddSeatCoordinate();
-        seatColumn++;
-        if (seatRow == 'A' && seatColumn == 17) {
-            seatRow = 'B';
-            seatColumn = 1;
+        for (Speaker& speaker : all_speakers) {
+            speaker.Play();
         }
-        if (seatRow == 'B' && seatColumn == 17) {
-            seatRow = 'C';
-            seatColumn = 1;
+
+        for (Instrument& instrument : all_instruments) {
+            instrument.Play();
         }
-        if (seatRow == 'C' && seatColumn == 17) {
-            seatRow = 'D';
-            seatColumn = 1;
+    }
+    // Loop sounds
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        for (Speaker& speaker : all_speakers) {
+            speaker.SetLooping();
         }
-        if (seatRow == 'D' && seatColumn == 17) {
-            seatRow = 'E';
-            seatColumn = 1;
-        }
-        if (seatRow == 'E' && seatColumn == 17) {
-            seatRow = 'F';
-            seatColumn = 1;
-        }
-        if (seatRow == 'F' && seatColumn == 17) {
-            seatRow = 'G';
-            seatColumn = 1;
+
+        for (Instrument& instrument : all_instruments) {
+            instrument.SetLooping();
         }
     }
 
@@ -407,7 +326,7 @@ int main()
     sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
 
     // json config file
-    json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution2.json").string());
+    json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution.json").string());
 
     // init sounds
     int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
@@ -462,24 +381,6 @@ int main()
         0.1f, 100.0f);
 
     glm::mat4 auditorium_model = glm::mat4(1.0f);
-
-    // Set up theater:
-    //auditorium_model = glm::scale(modelMatrix, glm::vec3(0.9f, 0.9f, 0.001f));
-    
-    // Speaker 1 Play
-    
-    for (Speaker& speaker : all_speakers) {
-        speaker.SetLooping(true);
-       speaker.Play();
-    }
-    
-
-
-    for (Instrument& instrument : all_instruments) {
-        instrument.SetLooping(true);
-        instrument.Play();
-    }
-
 
     // Set up rendering
     glEnable(GL_DEPTH_TEST);

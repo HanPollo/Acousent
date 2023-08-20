@@ -27,14 +27,16 @@ public:
 
 	void positionObject(float x, float y, float z);
 	void Draw();
-
+	
+	glm::vec3 getPosition();
 	void addAudioSource(SoundSource& audio_source);
 
 	void addSound(int sound);
 	void Play(const ALuint& buffer_to_play);
 	void Play();
-	void SetLooping(bool loop);
+	void SetLooping();
 	bool isPlaying();
+	bool isLooping();
 
 	virtual void Update();
 
@@ -43,7 +45,7 @@ public:
 	void Scale(float x, float y, float z);
 	void Scale(float multiplier);
 
-	void ResetVectors();
+	virtual void ResetVectors();
 
 	bool HasAudioSource();
 	bool isListener();

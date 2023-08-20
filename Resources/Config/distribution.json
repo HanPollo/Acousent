@@ -1,47 +1,84 @@
 {
+  "instruments": [
+    {
+      "id": 0,
+      "midi_file": "venture.mid",
+      "midi_track": 0,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "soundfont_file": "florestan-subset.sf2",
+      "soundfont_preset": 0
+    },
+    {
+      "id": 1,
+      "midi_file": "venture.mid",
+      "midi_track": 1,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -10.0
+      },
+      "soundfont_file": "florestan-subset.sf2",
+      "soundfont_preset": 7
+    },
+    {
+      "id": 2,
+      "midi_file": "venture.mid",
+      "midi_track": 4,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -20.0
+      },
+      "soundfont_file": "florestan-subset.sf2",
+      "soundfont_preset": 0
+    },
+    {
+      "id": 3,
+      "midi_file": "venture.mid",
+      "midi_track": 5,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 10.0
+      },
+      "soundfont_file": "florestan-subset.sf2",
+      "soundfont_preset": 0
+    },
+    {
+      "id": 4,
+      "midi_file": "venture.mid",
+      "midi_track": 9,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 20.0
+      },
+      "soundfont_file": "florestan-subset.sf2",
+      "soundfont_preset": 0
+    }
+  ],
   "speakers": [
     {
       "audio_file": "Sound1_R.wav",
       "id": 2,
       "position": {
         "x": 0.0,
-        "y": 30.0,
-        "z": 0.0
+        "y": 15.0,
+        "z": 20.0
       }
     },
     {
       "audio_file": "Sound1_R.wav",
-      "id": 3,
-      "position": {
-        "x": 0.0,
-        "y": 200.0,
-        "z": -230.0
-      }
-    }
-  ],
-
-  "instruments": [
-    {
-      "id": 1,
-      "midi_file": "tracks2.mid",
-      "midi_track": 2,
-      "position": {
-        "x": 0.0,
-        "y": 30.0,
-        "z": 230.0
-      },
-      "soundfont_file": "florestan-subset.sf2",
-      "soundfont_preset": 0
-    },
-    {
       "id": 2,
-      "midi_file": "midi_example.mid",
       "position": {
         "x": 0.0,
-        "y": 200.0,
-        "z": -400.0
-      },
-      "soundfont_file": "florestan-subset.sf2"
+        "y": 15.0,
+        "z": -20.0
+      }
     }
   ]
 }

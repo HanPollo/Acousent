@@ -9,7 +9,6 @@ Object::Object() //Ponerle game Object
 
 Object::~Object()
 {
-	std::cout << "Object Destroyer" << std::endl;
 }
 
 
@@ -36,6 +35,11 @@ void Object::Draw()
 	}
 }
 
+glm::vec3 Object::getPosition()
+{
+	return position;
+}
+
 void Object::addAudioSource(SoundSource& audio_source)
 {
 	sourceID = audio_source.getSourceID();
@@ -60,16 +64,17 @@ void Object::Play()
 {
 	if (object_Asource != nullptr) {
 		if (sounds.size() > 0) {
-			//if (!object_Asource->isPlaying())
-			object_Asource->Play(sounds.back());
-			std::cout << "Played a MIDI File" << std::endl;
+			if (!object_Asource->isPlaying())
+				object_Asource->Play(sounds.back());
+			else object_Asource->Pause();
 		}
 	}
 }
 
-void Object::SetLooping(bool loop)
+void Object::SetLooping()
 {
-	object_Asource->SetLooping(loop);
+	object_Asource->SetLooping(!object_Asource->isLooping());
+
 }
 
 bool Object::isPlaying()
@@ -77,10 +82,15 @@ bool Object::isPlaying()
 	return object_Asource->isPlaying();
 }
 
+bool Object::isLooping()
+{
+	return object_Asource->isLooping();
+}
+
 void Object::Update()
 {
-	transform_model = glm::rotate(transform_model, rotate_angle, rotate_vector);
 	transform_model = glm::scale(transform_model, scale_vector);
+	transform_model = glm::rotate(transform_model, rotate_angle, rotate_vector);
 	transform_model = glm::translate(transform_model, translate_vector);
 	position = glm::vec3(transform_model[3][0], transform_model[3][1], transform_model[3][2]);
 
@@ -88,7 +98,7 @@ void Object::Update()
 		object_Asource->SetPosition(position[0], position[1], position[2]);
 	}
 
-
+	ResetVectors();
 	//object_shader->setMat4("model", transform_model);
 	//Draw();
 }
@@ -121,10 +131,10 @@ void Object::Scale(float multiplier)
 
 void Object::ResetVectors()
 {
-	translate_vector = glm::vec3(0.0f, 0.0f, 0.0f);
+	scale_vector = glm::vec3(1.0f, 1.0f, 1.0f);
 	rotate_vector = glm::vec3(1.0f, 0.0f, 0.0f);
 	rotate_angle = glm::radians(0.f);
-	scale_vector = glm::vec3(1.0f, 1.0f, 1.0f);
+	translate_vector = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 bool Object::HasAudioSource()

@@ -14,7 +14,7 @@ public:
     Instrument(Type type);
 
     void Update() override;
-
+    //void ResetVectors() override;
     glm::vec3 sound_direction;
     Type type = GROUNDED;
     

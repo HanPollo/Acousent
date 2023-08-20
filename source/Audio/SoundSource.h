@@ -26,6 +26,7 @@ public:
 	glm::vec3 GetPosition();
 
 	bool isPlaying();
+	bool isLooping();
 	ALuint getSourceID() const;
 
 private:

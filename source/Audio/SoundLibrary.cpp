@@ -90,7 +90,7 @@ void ProcessMIDIAndRender(float* audioStream, int streamLength, tml_message* tml
 	}
 }
 
-// Esta es la funcion principal para la lectura de archivos MIDI. Lee los archivos y crea un buffer que lo guarda en el puntero audioStream.
+// Esta es la funcion principal para la lectura de tracks especificos archivos MIDI. Lee los archivos y crea un buffer que lo guarda en el puntero audioStream.
 void ProcessTrackAndRender(float* audioStream, int streamLength, int trackNumber, int presetNumber, tml_message* tml, tsf* tsf)
 {
 	double g_Msec = 0;
@@ -108,15 +108,11 @@ void ProcessTrackAndRender(float* audioStream, int streamLength, int trackNumber
 		for (g_Msec += sampleBlock * (1000.0 / 44100.0); tml && g_Msec >= tml->time; tml = tml->next)
 		{
 			tsf_channel_set_presetindex(tsf, trackNumber, presetNumber);
-			// Check if the MIDI message is from the desired track
+			// Revisa si el mensaje midi es el que se desea reproducir.
 			if (tml->channel == trackNumber)
 			{
 				switch (tml->type)
 				{
-				case TML_PROGRAM_CHANGE:
-					// Si el MIDI tiene algun numero de preset especifico para elegir instrumento se detecta aca y se cambia el preset del soundfont
-					tsf_channel_set_presetnumber(tsf, tml->channel, presetNumber, (tml->channel == 9));
-					break;
 				case TML_NOTE_ON:
 					// Nota ON
 					tsf_channel_note_on(tsf, tml->channel, tml->key, tml->velocity / 127.0f);
@@ -315,12 +311,13 @@ ALuint SoundLibrary::LoadMIDI(const char* midi, const char* sf2, bool singleTrac
 		unsigned int time_length;
 		tml_get_info(TinyMidiLoader, &channels, &out_programs, &out_total_notes, &out_first_note, &time_length);
 
+		/*
 		cout << "Channels: " << channels << endl;
 		cout << "Programs: " << out_programs << endl;
 		cout << "Total notes: " << out_total_notes << endl;
 		cout << "First note: " << out_first_note << endl;
 		cout << "Time length: " << time_length << endl;
-
+		*/
 		// Creamos el buffer de OpenAL utilizando el buffer audioStream para la informacion del audio.
 		ALuint buffer;
 		alGenBuffers(1, &buffer);

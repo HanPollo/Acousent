@@ -23,7 +23,6 @@ SoundSource::SoundSource(int amount, std::vector<SoundSource*> sources)
 
 SoundSource::~SoundSource()
 {
-	std::cout << "SoundSource Destroyer" << std::endl;
 	alDeleteSources(1, &p_Source);
 }
 
@@ -90,6 +89,13 @@ bool SoundSource::isPlaying()
 	ALint playState;
 	alGetSourcei(p_Source, AL_SOURCE_STATE, &playState);
 	return (playState == AL_PLAYING);
+}
+
+bool SoundSource::isLooping()
+{
+	ALint loopState;
+	alGetSourcei(p_Source, AL_LOOPING, &loopState);
+	return (loopState == AL_TRUE);
 }
 
 ALuint SoundSource::getSourceID() const

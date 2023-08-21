@@ -63,6 +63,14 @@ function(MakeExample TARGETNAME FILENAME)
 	add_custom_command(TARGET ${TARGETNAME} POST_BUILD        
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different 
         $<TARGET_FILE:OpenAL> $<TARGET_FILE_DIR:${TARGETNAME}>)
+    add_custom_command(TARGET ${TARGETNAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:glfw> $<TARGET_FILE_DIR:${TARGETNAME}>)
+    add_custom_command(TARGET ${TARGETNAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:assimp> $<TARGET_FILE_DIR:${TARGETNAME}>)
+
+
 
 endfunction(MakeExample)
 

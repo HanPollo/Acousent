@@ -36,6 +36,8 @@ public:
 	void Play();
 	void SetLooping();
 	bool isPlaying();
+	bool isPaused();
+	bool isStopped();
 	bool isLooping();
 
 	virtual void Update();

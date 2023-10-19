@@ -91,6 +91,20 @@ bool SoundSource::isPlaying()
 	return (playState == AL_PLAYING);
 }
 
+bool SoundSource::isPaused()
+{
+	ALint playState;
+	alGetSourcei(p_Source, AL_SOURCE_STATE, &playState);
+	return (playState == AL_PAUSED);
+}
+
+bool SoundSource::isStopped()
+{
+	ALint playState;
+	alGetSourcei(p_Source, AL_SOURCE_STATE, &playState);
+	return (playState == AL_STOPPED);
+}
+
 bool SoundSource::isLooping()
 {
 	ALint loopState;

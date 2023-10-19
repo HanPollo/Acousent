@@ -58,6 +58,9 @@ vector<Instrument> all_instruments;
 vector<SoundSource*> all_sources;
 vector<Model*> all_models;
 SoundLibrary* AudioLib = SoundLibrary::Get();
+bool looping = false;
+bool noSourcesPlaying = true;
+int sourceNum = 0;
 
 // JSON Configuration
 json readJsonFromFile(const std::string& filename) {
@@ -233,15 +236,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //Play sounds
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
         for (Speaker& speaker : all_speakers) {
-            speaker.Play();
+            if (noSourcesPlaying || !speaker.isStopped()) {
+                speaker.Play();
+            }
+            
         }
 
         for (Instrument& instrument : all_instruments) {
-            instrument.Play();
+            if (noSourcesPlaying || !instrument.isStopped()) {
+                instrument.Play();
+            }
         }
+        noSourcesPlaying = false;
     }
     // Loop sounds
     if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        /*
         for (Speaker& speaker : all_speakers) {
             speaker.SetLooping();
         }
@@ -249,6 +259,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         for (Instrument& instrument : all_instruments) {
             instrument.SetLooping();
         }
+        */
+        looping = !looping;
     }
 
     //Camera controls
@@ -369,7 +381,8 @@ int main()
 
         all_instruments[i].addAudioSource(*source_instrum);
     }
-    
+    sourceNum = all_instruments.size() + all_sources.size();
+
     glfwSetKeyCallback(window.getGLFWWindow(), key_callback);
     glfwSetCursorPosCallback(window.getGLFWWindow(), mouse_callback);
     glfwSetScrollCallback(window.getGLFWWindow(), scroll_callback);
@@ -410,15 +423,27 @@ int main()
         // Update Sound device
         sd->SetLocation(camera.position_[0], camera.position_[1], camera.position_[2]);
         sd->SetOrientation(camera.front_[0], camera.front_[1], camera.front_[2], camera.up_[0], camera.up_[1], camera.up_[2]);
-
+        noSourcesPlaying = true;
         for (Speaker& speaker : all_speakers) {
             speaker.Update();
             speaker.Draw();
+            noSourcesPlaying = (noSourcesPlaying && speaker.isStopped());
         }
 
         for (Instrument& instrument : all_instruments) {
             instrument.Update();
             instrument.Draw();
+            noSourcesPlaying = (noSourcesPlaying && instrument.isStopped());
+        }
+        for (Speaker& speaker : all_speakers) {
+            if (looping && noSourcesPlaying) {
+                speaker.Play();
+            }
+        }
+        for (Instrument& instrument : all_instruments) {
+            if (looping && noSourcesPlaying) {
+                instrument.Play();
+            }
         }
         
         window.swapBuffers();

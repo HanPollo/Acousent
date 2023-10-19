@@ -82,6 +82,16 @@ bool Object::isPlaying()
 	return object_Asource->isPlaying();
 }
 
+bool Object::isPaused()
+{
+	return object_Asource->isPaused();
+}
+
+bool Object::isStopped()
+{
+	return object_Asource->isStopped();
+}
+
 bool Object::isLooping()
 {
 	return object_Asource->isLooping();

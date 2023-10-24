@@ -18,9 +18,12 @@ class Object
 
 public:
 	Object();
+	Object(std::string name);
 	virtual ~Object();
+	std::string name;
 
 	void setModel(Model& model);
+	void setModel();
 	void setShader(Shader& shader);
 
 	Shader& getShader();
@@ -73,8 +76,8 @@ protected:
 	list<int> sounds;
 
 	float rot_speed = 1.f;
-	float move_speed = 1.f;
-	float scale_speed = 0.01f;
+	float move_speed = 0.5f;
+	float scale_speed = 1.f;
 
 
 

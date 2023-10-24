@@ -1,7 +1,8 @@
 {
-  "instruments": [
+  "midi_instruments": [
     {
       "id": 0,
+      "name": "Accordion",
       "midi_file": "venture.mid",
       "midi_track": 0,
       "position": {
@@ -14,70 +15,126 @@
     },
     {
       "id": 1,
+      "name": "Bagpipes",
       "midi_file": "venture.mid",
       "midi_track": 1,
       "position": {
         "x": 0.0,
         "y": 0.0,
-        "z": -10.0
+        "z": 0.0
       },
       "soundfont_file": "florestan-subset.sf2",
       "soundfont_preset": 7
     },
     {
       "id": 2,
+      "name": "BassGuitar",
       "midi_file": "venture.mid",
       "midi_track": 4,
       "position": {
         "x": 0.0,
         "y": 0.0,
-        "z": -20.0
+        "z": 0.0
       },
       "soundfont_file": "florestan-subset.sf2",
       "soundfont_preset": 0
     },
     {
       "id": 3,
+      "name": "Drums",
       "midi_file": "venture.mid",
       "midi_track": 5,
       "position": {
         "x": 0.0,
         "y": 0.0,
-        "z": 10.0
+        "z": 0.0
       },
       "soundfont_file": "florestan-subset.sf2",
       "soundfont_preset": 0
     },
     {
       "id": 4,
+      "name": "ElectricGuitar",
       "midi_file": "venture.mid",
       "midi_track": 9,
       "position": {
         "x": 0.0,
         "y": 0.0,
-        "z": 20.0
+        "z": 0.0
       },
       "soundfont_file": "florestan-subset.sf2",
       "soundfont_preset": 0
     }
   ],
-  "speakers": [
+  "audio_instruments": [
     {
       "audio_file": "Sound1_R.wav",
       "id": 2,
+      "name": "Guitar",
       "position": {
         "x": 0.0,
-        "y": 15.0,
-        "z": 20.0
+        "y": 0.0,
+        "z": 0.0
       }
     },
     {
       "audio_file": "Sound1_R.wav",
       "id": 2,
+      "name": "Marimba",
       "position": {
         "x": 0.0,
-        "y": 15.0,
-        "z": -20.0
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "id": 2,
+      "name": "Piano",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "id": 2,
+      "name": "Speaker",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "id": 2,
+      "name": "Peo",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "id": 2,
+      "name": "Violin",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "id": 2,
+      "name": "Synth",
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
       }
     }
   ]

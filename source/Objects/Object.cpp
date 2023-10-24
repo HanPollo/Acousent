@@ -1,10 +1,18 @@
 #include "Object.h"
 
-Object::Object() //Ponerle game Object
+Object::Object()
 {
 	object_model = nullptr;
 	object_shader = nullptr;
+	name = "";
 
+}
+
+Object::Object(std::string name)
+{
+	object_model = nullptr;
+	object_shader = nullptr;
+	name = name;
 }
 
 Object::~Object()
@@ -15,6 +23,10 @@ Object::~Object()
 void Object::setModel(Model& model)
 {
 	object_model = &model;
+}
+
+void Object::setModel()
+{
 }
 
 void Object::setShader(Shader& shader)
@@ -122,16 +134,17 @@ void Object::Rotate(float angle, Axis axis)
 	else if (axis == Z)
 		rotate_vector = glm::vec3(0.0f, 0.0f, 1.0f);
 	rotate_angle = glm::radians(angle);
+	rotate_vector *= rot_speed;
 }
 
 void Object::Translate(float x, float y, float z)
 {
-	translate_vector = glm::vec3(x, y, z);
+	translate_vector = glm::vec3(x, y, z) * move_speed;
 }
 
 void Object::Scale(float x, float y, float z)
 {
-	scale_vector = glm::vec3(x, y, z);
+	scale_vector = glm::vec3(x, y, z) * scale_speed;
 }
 
 void Object::Scale(float multiplier)

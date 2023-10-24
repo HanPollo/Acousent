@@ -49,6 +49,9 @@ private:
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
+    // Calculate the scaling factor of a mesh.
+    float calculateMeshScalingFactor(aiMesh* mesh);
+
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);

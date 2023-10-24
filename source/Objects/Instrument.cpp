@@ -3,10 +3,9 @@
 Instrument::Instrument() : Object()
 {
 
-	transform_model = glm::scale(transform_model, glm::vec3(0.17f, 0.17f, 0.17f));
-	transform_model = glm::rotate(transform_model, glm::radians(90.0f), glm::vec3(0, 1, 0));
-	transform_model = glm::translate(transform_model, glm::vec3(0.0f, 0.0f, 0.0f));
-	transform_model = glm::translate(transform_model, glm::vec3(19.0f, 5.9f, 1.f));
+	//transform_model = glm::scale(transform_model, glm::vec3(1.f, 1.f, 1.f));
+	//transform_model = glm::rotate(transform_model, glm::radians(90.0f), glm::vec3(0, 1, 0));
+	//transform_model = glm::translate(transform_model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 	ResetVectors();
    

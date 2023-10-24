@@ -1,0 +1,67 @@
+# Blender 3.5.1 MTL File: 'all_instruments.blend'
+# www.blender.org
+
+newmtl chair_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd chair_mt_baseColor.png
+map_d chair_mt_baseColor.png
+map_Bump -bm 1.000000 chair_mt_normal.png
+
+newmtl piano_body_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd piano_body_mt_baseColor.png
+map_d piano_body_mt_baseColor.png
+
+newmtl piano_logo_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd piano_logo_mt_baseColor.png
+map_d piano_logo_mt_baseColor.png
+map_Bump -bm 1.000000 piano_logo_mt_normal.png
+
+newmtl piano_metal_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd piano_metal_mt_baseColor.png
+map_d piano_metal_mt_baseColor.png
+map_Bump -bm 1.000000 piano_metal_mt_normal.png
+
+newmtl piano_velvet_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd piano_velvet_mt_baseColor.png
+map_d piano_velvet_mt_baseColor.png
+map_Bump -bm 1.000000 piano_velvet_mt_normal.png
+
+newmtl piano_wood_mt
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd piano_wood_mt_baseColor.png
+map_d piano_wood_mt_baseColor.png
+map_Bump -bm 1.000000 piano_wood_mt_normal.png

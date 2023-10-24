@@ -1,10 +1,22 @@
 {
-  "instruments": [
+  "midi_instruments": [
     {
       "id": 0,
+      "name": "Drums",
       "midi_file": "venture.mid",
       "position": {
-        "x": 0.0,
+        "x": -2.5,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "soundfont_file": "florestan-subset.sf2"
+    },
+    {
+      "id": 0,
+      "name": "Marimbsa",
+      "midi_file": "venture.mid",
+      "position": {
+        "x": 2.5,
         "y": 0.0,
         "z": 0.0
       },

@@ -21,7 +21,7 @@ set(ACOUSENT_HEADERS
         "Rendering/Mesh.h"
         "Rendering/Model.h"
         "Rendering/Shader.h"
-        #"Rendering/Texture.h"
+        "Rendering/ModelManager.h"
 
         )
 set(ACOUSENT_SOURCES
@@ -42,7 +42,7 @@ set(ACOUSENT_SOURCES
         "Rendering/Mesh.cpp"
         "Rendering/Model.cpp"
         "Rendering/Shader.cpp"
-        #"Rendering/Texture.cpp"
+        "Rendering/ModelManager.cpp"
         )
 add_library(acousent STATIC ${ACOUSENT_SOURCES} ${ACOUSENT_HEADERS} Core/system.h ${Shaders})
 if (MSVC)

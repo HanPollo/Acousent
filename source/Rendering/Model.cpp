@@ -76,6 +76,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
             // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
+
             vertex.TexCoords = vec;
             // tangent
             vector.x = mesh->mTangents[i].x;
@@ -93,7 +94,20 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
         vertices.push_back(vertex);
     }
-    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+    // Calculate the scaling factor for this mesh
+    float meshScalingFactor = calculateMeshScalingFactor(mesh);
+    /*
+    // Apply the scaling factor to vertex positions and store it in the vertices
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex& vertex = vertices[i];
+        // Scale the vertex position and store the scaling factor
+        vertex.Position *= meshScalingFactor;
+        vertex.ScalingFactor = meshScalingFactor;
+
+    }
+    */
+    // now wak through each of the mesh's faces (a face is a triangle os a mesh) and retrieve the corresponding vertex indices.
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
@@ -125,6 +139,33 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
+}
+
+float Model::calculateMeshScalingFactor(aiMesh* mesh)
+{
+    // Calculate a scaling factor based on the mesh's properties by calculating the maximum dimension of the mesh's bounding box.
+    aiVector3D min, max;
+    mesh->mVertices[0].Set(1, 1, 1);
+    mesh->mVertices[1].Set(0, 0, 0);
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        min.x = std::min(min.x, mesh->mVertices[i].x);
+        min.y = std::min(min.y, mesh->mVertices[i].y);
+        min.z = std::min(min.z, mesh->mVertices[i].z);
+
+        max.x = std::max(max.x, mesh->mVertices[i].x);
+        max.y = std::max(max.y, mesh->mVertices[i].y);
+        max.z = std::max(max.z, mesh->mVertices[i].z);
+    }
+
+    float scaleFactor = 1.0f;
+    // Calculate the maximum dimension of the bounding box
+    float maxDimension = std::max(max.x - min.x, std::max(max.y - min.y, max.z - min.z));
+    // Set a desired size for the mesh (e.g., 1.0) and calculate the scaling factor
+    if (maxDimension > 0.0f) {
+        scaleFactor = 1.0f / maxDimension;
+    }
+
+    return scaleFactor;
 }
 
 vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName) {

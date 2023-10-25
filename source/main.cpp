@@ -408,26 +408,13 @@ int main()
 
     // json config file
     json distribution = readJsonFromFile(ac::getPath("Resources/Config/distribution2.json").string());
-
-    // init sounds
-    int speaker_sound = AudioLib->Load(ac::getPath("Resources/Audio/Wav/Sound1_R.wav").string().c_str());
-    // init audio sources
-    //SoundSource speaker1_source;
    
     //Speakers;
-    //Model speaker_model(ac::getPath("Resources/Models/Speaker/scene.gltf").string());
-    //shared_ptr<Model> shared_speaker_model = make_shared<Model>(speaker_model);
     processSpeakers(all_speakers, distribution);
-    /*
-    for (int i = 0; i < all_speakers.size(); i++) {
-        all_speakers[i].setModel(speaker_model);
-    }
-    */
+
     for (int i = 0; i < all_speakers.size(); i++) {
         all_speakers[i].setShader(shader);
     }
-
-    
     vector<SoundSource> sources_speakers;
     for (int i = 0; i < all_speakers.size(); i++) {
         SoundSource* source_speaker = new SoundSource;
@@ -436,14 +423,7 @@ int main()
     }
 
     //Instruments;
-    //Model instrument_model(ac::getPath("Resources/Models/Piano3/instrument.obj").string());
-    //shared_ptr<Model> shared_instrument_model = make_shared<Model>(instrument_model);
     processInstruments(all_instruments, distribution);
-    /*
-    for (int i = 0; i < all_instruments.size(); i++) {
-        all_instruments[i].setModel(instrument_model);
-    }
-    */
     for (int i = 0; i < all_instruments.size(); i++) {
         all_instruments[i].setShader(shader);
     }

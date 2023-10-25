@@ -1,26 +1,114 @@
 {
-  "midi_instruments": [
+  "audio_instruments": [
     {
-      "id": 0,
-      "name": "Drums",
-      "midi_file": "venture.mid",
+      "audio_file": "Sound1_R.wav",
+      "name": "Accordion",
+      "id": 2,
       "position": {
-        "x": -2.5,
-        "y": 0.0,
+        "x": -6.0,
+        "y": 8.0,
         "z": 0.0
-      },
-      "soundfont_file": "florestan-subset.sf2"
+      }
     },
     {
-      "id": 0,
-      "name": "Marimbsa",
-      "midi_file": "venture.mid",
+      "audio_file": "Sound1_R.wav",
+      "name": "Bagpipes",
+      "id": 2,
       "position": {
-        "x": 2.5,
+        "x": -3.0,
+        "y": 8.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "BassGuitar",
+      "id": 2,
+      "position": {
+        "x": 0.0,
+        "y": 8.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "ElectricGuitar",
+      "id": 2,
+      "position": {
+        "x": 3.0,
+        "y": 8.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Guitar",
+      "id": 2,
+      "position": {
+        "x": 6.0,
+        "y": 8.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Speaker",
+      "id": 2,
+      "position": {
+        "x": -4.5,
+        "y": 4.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Synth",
+      "id": 2,
+      "position": {
+        "x": 0.0,
+        "y": 4.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Violin",
+      "id": 2,
+      "position": {
+        "x": 4.5,
+        "y": 4.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Drums",
+      "id": 2,
+      "position": {
+        "x": -4.5,
         "y": 0.0,
         "z": 0.0
-      },
-      "soundfont_file": "florestan-subset.sf2"
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Piano",
+      "id": 2,
+      "position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    },
+    {
+      "audio_file": "Sound1_R.wav",
+      "name": "Marimba",
+      "id": 2,
+      "position": {
+        "x": 4.5,
+        "y": 0.0,
+        "z": 0.0
+      }
     }
   ]
 }
